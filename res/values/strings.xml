@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">Cross Lasers</string>
+<string name="change_level">Switch Levels</string>
+<string name="unlock_levels">Unlock All Levels</string>
+<string name="unlock_next_level">Unlock Next Level</string>
+<string name="method_tracing">Toggle Method Tracing</string>
+
+<string name = "game_over">GAME OVER</string>
+<string name = "thanks_for_playing">THANKS FOR PLAYING!</string>
+<string name = "please_wait">PLEASE WAIT</string>
+
+<!-- UI -->
+<string name="preference_save_game">Game Data</string>
+<string name="preference_erase_save_game">Erase Saved Game</string>
+<string name="preference_erase_save_game_dialog">Really erase your saved game?  All of your progress will be lost!</string>
+<string name="preference_erase_save_game_dialog_title">Now wait just a minute</string>
+<string name="preference_erase_save_game_dialog_ok">Erase Save</string>
+<string name="preference_erase_save_game_dialog_cancel">Cancel</string>
+
+
+<string name="preference_game_settings">Game Settings</string>
+<string name="preference_enable_sound">Enable Sound</string>
+<string name="preference_enable_sound_summary">Disabling sound may improve performance on some devices.</string>
+
+<string name="preference_safe_mode">Safe Mode</string>
+<string name="preference_safe_mode_summary">Enables safety hacks for broken devices (Cliq, etc), but causes some visual artifacts. Try this if you have problems.</string>
+
+<string name="preference_configure_controls">Configure Controls</string>
+<string name="preference_enable_click_attack">Click Attack</string>
+<string name="preference_enable_click_attack_summary">Use the trackball click or directional pad center button to attack.</string>
+<string name="preference_enable_tilt_controls">Tilt Controls</string>
+<string name="preference_enable_tilt_controls_summary">EXPERIMENTAL!  Tilt the phone left and right to drive the Android around.  Good for devices with no trackball or d-pad.</string>
+
+<string name="preference_movement_sensitivity">Motion Sensitivity</string>
+<string name="preference_movement_sensitivity_summary">Adjusts the sensitivity of the trackball, d-pad, or optical sensor.</string>
+<string name="preference_movement_min">Slow</string>
+<string name="preference_movement_max">Fast</string>
+
+<string name="preference_tilt_sensitivity">Tilt Sensitivity</string>
+<string name="preference_tilt_sensitivity_summary">Adjusts the sensitivity of the tilt controls.</string>
+<string name="preference_tilt_min">Slow</string>
+<string name="preference_tilt_max">Fast</string>
+
+<string name="preference_key_config">Configure Keyboard</string>
+<string name="preference_key_config_summary">Customize keys for phones with hard keyboards.</string>
+<string name="preference_key_config_dialog_title">Configure Keyboard</string>
+<string name="preference_key_config_dialog_ok">Save</string>
+<string name="preference_key_config_dialog_cancel">Cancel</string>
+<string name="preference_key_config_left">Left</string>
+<string name="preference_key_config_right">Right</string>
+<string name="preference_key_config_jump">Jump</string>
+<string name="preference_key_config_attack">Attack</string>
+
+<string name="preference_enable_statistics">Report Play Statistics</string>
+<string name="preference_enable_statistics_summary">Sends anonymous play statistics to a server to help us make this game more fun.</string>
+
+<string name="preference_about">About</string>
+<string name="preference_about_title">About Cross Lasers</string>
+<string name="preference_about_summary">Cross Lasers was made by Cassio Landim.</string>
+<string name="preference_visit_site">Go to the Cross Lasers web site</string>
+<string name="preference_thanks_title">Special Thanks</string>
+<string name="preference_thanks_summary">Special Thanks to Chris Pruett.</string>
+<string name="preference_licence_title">License</string>
+<string name="preference_licence_summary">Portions of this game are modifications based on work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License.</string>
+<string name="preference_misc">More Information</string>
+<string name="preference_enable_debug">Debug Log</string>
+<string name="preference_enable_debug_summary">Output various logs to logcat.  This option will slow the game down.</string>
+
+<string name="saved_game_erased_notification">Saved Game Erased</string>
+
+<string name="quit_game_dialog_title">Quit Game?</string>
+<string name="quit_game_dialog_ok">Quit</string>
+<string name="quit_game_dialog_cancel">Cancel</string>
+<string name="quit_game_dialog_message">Return to main menu?</string>
+
+<string name="nav_type">Trackball</string>
+
+<string name="whats_new_dialog_title">Cross Lasers</string>
+<string name="whats_new_dialog_ok">Ok! Let's Go!</string>
+<string name="whats_new_dialog_message">Thanks for downloading Cross Lasers.\n\n
+<b>New in this version:</b>\n
+\t• Everything is new! This is Alpha version!</string>
+
+<string name="whats_new_ticker">Everything is new! This is Alpha version!</string>
+
+<!-- Toast Messages -->
+<string name="memory_playback_start">MEMORY PLAYBACK START</string>
+<string name="memory_playback_complete">MEMORY PLAYBACK COMPLETE</string>
+<string name = "diary_found">FOUND OLD DIARY</string>
+
+<!--  names -->
+<string name = "Wanda">Wanda</string>
+<string name = "Kyle">Kyle</string>
+<string name = "Kabocha">Dr. Kabochanomizu</string>
+<string name = "Rokudou">Mr. Rokudou</string>
+<string name = "Android">Android</string>
+
+<!-- level names -->
+<string name = "level_0_1_sewer">Memory #000</string>
+<string name = "level_0_1_sewer_kyle">Memory #024.3</string>
+<string name = "level_0_1_sewer_wanda">Memory #024.7</string>
+<string name = "level_0_2_lab">Memory #001</string>
+<string name = "level_0_3_lab">Memory #002</string>
+
+<string name = "level_puzzle_test">Puzzle Test</string>
+<string name = "level_object_test">Object Test</string>
+<string name = "level_performance_test">Performance Test</string>
+<string name = "level_performance_test2">Performance Test 2</string>
+<string name = "level_performance_test3">Performance Test 3</string>
+<string name = "level_npc_motion_test">NPC Motion Test</string>
+
+<!-- Level time codes -->
+
+<!-- level names -->
+<string name = "level_0_1_time">+ 07:12:03</string>
+<string name = "level_0_2_time">+ 00:00:00</string>
+<string name = "level_0_3_time">+ 00:06:26</string>
+
+<string name = "level_test_time">(test level)</string>
+
+</resources>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="net.cassiolandim.crosslasers" android:versionCode="1"
+	android:versionName="1.0">
+	
+  <application android:icon="@drawable/icon" android:label="@string/app_name"
+    android:debuggable="false" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+    
+    <activity android:name=".activity.MainMenuActivity" android:label="@string/app_name"
+      android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
+    <activity android:name=".activity.AndouKun" android:label="@string/app_name"
+      android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation"
+      android:launchMode="singleTask" />
+
+    <activity android:name=".activity.LevelSelectActivity"
+      android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation" />
+
+    <activity android:name=".activity.ConversationDialogActivity" 
+      android:theme="@style/Theme.ConversationDialog"
+      android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation" />
+
+    <activity android:name=".activity.DiaryActivity"
+      android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation" />
+
+    <activity android:name=".activity.SetPreferencesActivity"
+      android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation" />
+
+    <activity android:name=".activity.AnimationPlayerActivity"
+      android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation" />
+	</application>
+
+	<uses-permission android:name="android.permission.VIBRATE" />
+	<uses-permission xmlns:android="http://schemas.android.com/apk/res/android"
+		android:name="android.permission.INTERNET" />
+	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
+
+</manifest> 
