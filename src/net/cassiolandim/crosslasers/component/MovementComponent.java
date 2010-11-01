@@ -27,7 +27,7 @@ import net.cassiolandim.crosslasers.Interpolator;
 public class MovementComponent extends GameComponent {
     // If multiple game components were ever running in different threads, this would need
     // to be non-static.
-    private static Interpolator sInterpolator = new Interpolator();
+    protected static Interpolator sInterpolator = new Interpolator();
 
     public MovementComponent() {
         super();

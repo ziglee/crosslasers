@@ -102,17 +102,6 @@ public class LevelBuilder extends BaseObject {
                             textureLibrary.allocateTexture(backgroundResource));
                 scroller3.setRenderComponent(backgroundRender);
                 
-                // Scroll speeds such that the background will evenly match the beginning
-                // and end of the level.  Don't allow speeds > 1.0, though; that would be faster than
-                // the foreground, which is disorienting and looks like rotation.
-                final float scrollSpeedX = Math.min((float)(width - params.gameWidth) / (levelWidth - params.gameWidth), 1.0f);
-                final float scrollSpeedY = Math.min((float)(height - params.gameHeight) / (levelHeight - params.gameHeight), 1.0f);
-                
-                 
-                scroller3.setScrollSpeed(scrollSpeedX, scrollSpeedY);
-                
-                backgroundRender.setCameraRelative(false);
-                
                 background.add(scroller3);
                 background.add(backgroundRender);
             }
@@ -179,7 +168,6 @@ public class LevelBuilder extends BaseObject {
 
         background.add(scroller);
         background.add(backgroundRender);
-        backgroundRender.setCameraRelative(false);
     }
 
     // This method is a HACK to workaround the stupid map file format.

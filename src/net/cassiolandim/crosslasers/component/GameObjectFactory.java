@@ -44,7 +44,6 @@ import net.cassiolandim.crosslasers.GameObject.Team;
 import net.cassiolandim.crosslasers.activity.AnimationPlayerActivity;
 import net.cassiolandim.crosslasers.component.AnimationComponent.PlayerAnimations;
 import net.cassiolandim.crosslasers.component.EnemyAnimationComponent.EnemyAnimations;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.ChannelSystem;
 import net.cassiolandim.crosslasers.system.LevelSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem;
@@ -56,7 +55,8 @@ import net.cassiolandim.crosslasers.system.SoundSystem;
  * a) generated from data at compile time, or b) described by data at runtime.
  */
 public class GameObjectFactory extends BaseObject {
-    private final static int MAX_GAME_OBJECTS = 384;
+
+	private final static int MAX_GAME_OBJECTS = 384;
     private final static ComponentPoolComparator sComponentPoolComparator = new ComponentPoolComparator();
     private FixedSizeArray<FixedSizeArray<BaseObject>> mStaticData;
     private FixedSizeArray<GameComponentPool> mComponentPools;
@@ -137,8 +137,6 @@ public class GameObjectFactory extends BaseObject {
         DOOR_GREEN_NONBLOCKING (54),
         
         GHOST_NPC(55),
-        
-        CAMERA_BIAS(56),
         
         FRAMERATE_WATCHER(57),
         INFINITE_SPAWNER(58),
@@ -237,7 +235,6 @@ public class GameObjectFactory extends BaseObject {
                 new ComponentClass(AttackAtDistanceComponent.class, 16),
                 new ComponentClass(BackgroundCollisionComponent.class, 192),
                 new ComponentClass(ButtonAnimationComponent.class, 32),
-                new ComponentClass(CameraBiasComponent.class, 8),
                 new ComponentClass(ChangeComponentsComponent.class, 256),
                 new ComponentClass(DoorAnimationComponent.class, 256),  //!
                 new ComponentClass(DynamicCollisionComponent.class, 256),
@@ -255,6 +252,7 @@ public class GameObjectFactory extends BaseObject {
                 new ComponentClass(LaunchProjectileComponent.class, 128),
                 new ComponentClass(LifetimeComponent.class, 384),
                 new ComponentClass(MotionBlurComponent.class, 1),
+                new ComponentClass(PlayerMovementComponent.class, 1),
                 new ComponentClass(MovementComponent.class, 128),
                 new ComponentClass(NPCAnimationComponent.class, 8),
                 new ComponentClass(NPCComponent.class, 8),
@@ -273,8 +271,6 @@ public class GameObjectFactory extends BaseObject {
                 new ComponentClass(SolidSurfaceComponent.class, 16),
                 new ComponentClass(SpriteComponent.class, 384),
                 new ComponentClass(TheSourceComponent.class, 1),
-
-                
         };
         
         mComponentPools = new FixedSizeArray<GameComponentPool>(componentTypes.length, sComponentPoolComparator);
@@ -525,9 +521,6 @@ public class GameObjectFactory extends BaseObject {
             case GHOST_NPC:
             	newObject = spawnGhostNPC(x, y);
             	break;
-            case CAMERA_BIAS:
-            	newObject = spawnCameraBias(x, y);
-            	break;
             case FRAMERATE_WATCHER:
             	newObject = spawnFrameRateWatcher(x, y);
             	break;
@@ -705,7 +698,7 @@ public class GameObjectFactory extends BaseObject {
         TextureLibrary textureLibrary = sSystemRegistry.shortTermTextureLibrary;
         
         GameObject object = mGameObjectPool.allocate();
-        object.getPosition().set(positionX, positionY);
+        object.getPosition().set(positionX, positionY - 300);
         object.activationRadius = mAlwaysActive;
         object.width = 64;
         object.height = 64;
@@ -716,8 +709,7 @@ public class GameObjectFactory extends BaseObject {
             final int staticObjectCount = 13;
             staticData = new FixedSizeArray<BaseObject>(staticObjectCount);
             
-            GameComponent gravity = allocateComponent(GravityComponent.class);
-            GameComponent movement = allocateComponent(MovementComponent.class);
+            GameComponent movement = allocateComponent(PlayerMovementComponent.class);
             PhysicsComponent physics = (PhysicsComponent)allocateComponent(PhysicsComponent.class);
 
             physics.setMass(9.1f);   // ~90kg w/ earth gravity
@@ -856,12 +848,9 @@ public class GameObjectFactory extends BaseObject {
             SpriteAnimation frozenAnim = new SpriteAnimation(PlayerAnimations.FROZEN.ordinal(), 1);
             // Frozen has no frames!
            
-            
             // Save static data
-            staticData.add(gravity);
             staticData.add(movement);
             staticData.add(physics);
-            
             
             staticData.add(idle);
             staticData.add(angle);
@@ -1120,11 +1109,6 @@ public class GameObjectFactory extends BaseObject {
             
         }
         
-        CameraSystem camera = sSystemRegistry.cameraSystem;
-        if (camera != null) {
-            camera.setTarget(object);
-        }
-            
         return object;
     }
     
@@ -1531,12 +1515,10 @@ public class GameObjectFactory extends BaseObject {
             idle.addFrame(idle2);
             idle.setLoop(true);
             
-            
             SpriteAnimation appear = new SpriteAnimation(EnemyAnimations.APPEAR.ordinal(), 6);
             AnimationFrame appear1 = new AnimationFrame(
                     textureLibrary.allocateTexture(R.drawable.enemy_shadowslime_activate01), 
                     Utils.framesToTime(24, 2), basicAttackVolume, basicVulnerabilityVolume);
-            
             AnimationFrame appear2 = new AnimationFrame(
                     textureLibrary.allocateTexture(R.drawable.enemy_shadowslime_activate02), 
                     Utils.framesToTime(24, 2), basicAttackVolume, basicVulnerabilityVolume);
@@ -1567,10 +1549,6 @@ public class GameObjectFactory extends BaseObject {
             hidden.addFrame(appear3);
             hidden.addFrame(appear2);
             hidden.addFrame(appear1);
-            /*hidden.addFrame(new AnimationFrame(
-                    textureLibrary.allocateTexture(R.drawable.enemy_shadowslime_stand), 
-                    Utils.framesToTime(24, 3), basicAttackVolume, basicVulnerabilityVolume));*/
-           
             
             SpriteAnimation attack = new SpriteAnimation(EnemyAnimations.ATTACK.ordinal(), 10);
             AnimationFrame attack1 = new AnimationFrame(
@@ -1613,7 +1591,6 @@ public class GameObjectFactory extends BaseObject {
 
             popOut.setupAttack(200, 2.0f, attack.getLength());
 
-            
             staticData.add(popOut);
             staticData.add(idle);
             staticData.add(hidden);
@@ -5842,29 +5819,6 @@ public class GameObjectFactory extends BaseObject {
         return object;
     }
     
-    private GameObject spawnCameraBias(float positionX, float positionY) {
-    	GameObject object = mGameObjectPool.allocate();
-        object.getPosition().set(positionX, positionY);
-        object.activationRadius = mTightActivationRadius;
-        object.width = 32;
-        object.height = 32;
-        
-        FixedSizeArray<BaseObject> staticData = getStaticData(GameObjectType.CAMERA_BIAS);
-        if (staticData == null) {
-            final int staticObjectCount = 1;
-            staticData = new FixedSizeArray<BaseObject>(staticObjectCount);
-            
-            GameComponent bias = allocateComponent(CameraBiasComponent.class);
-            
-            staticData.add(bias);
-            
-            setStaticData(GameObjectType.CAMERA_BIAS, staticData);
-        }
-        
-        addStaticData(GameObjectType.CAMERA_BIAS, object, null);
-        return object;
-	}
-    
     public GameObject spawnEffectSmokeBig(float positionX, float positionY) {
         TextureLibrary textureLibrary = sSystemRegistry.longTermTextureLibrary;
 
@@ -6236,7 +6190,6 @@ public class GameObjectFactory extends BaseObject {
         
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.OVERLAY);
-        render.setCameraRelative(false);
         
         FrameRateWatcherComponent watcher = (FrameRateWatcherComponent)allocateComponent(FrameRateWatcherComponent.class);
         watcher.setup(render, indicator);

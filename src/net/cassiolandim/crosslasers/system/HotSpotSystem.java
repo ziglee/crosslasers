@@ -44,8 +44,6 @@ public class HotSpotSystem extends BaseObject {
         public static final int TALK = 8;
         public static final int DIE = 9;
         public static final int WALK_AND_TALK = 10;
-        public static final int TAKE_CAMERA_FOCUS = 11;
-        public static final int RELEASE_CAMERA_FOCUS = 12;
         public static final int END_LEVEL = 13;
         public static final int GAME_EVENT = 14;
         public static final int NPC_RUN_QUEUED_COMMANDS = 15;

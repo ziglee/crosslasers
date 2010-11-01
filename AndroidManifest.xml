@@ -25,9 +25,6 @@
       android:theme="@style/Theme.ConversationDialog"
       android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation" />
 
-    <activity android:name=".activity.DiaryActivity"
-      android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation" />
-
     <activity android:name=".activity.SetPreferencesActivity"
       android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation" />
 

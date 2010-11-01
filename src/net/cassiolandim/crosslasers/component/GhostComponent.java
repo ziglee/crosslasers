@@ -22,7 +22,6 @@ import net.cassiolandim.crosslasers.GameObjectManager;
 import net.cassiolandim.crosslasers.InputButton;
 import net.cassiolandim.crosslasers.InputGameInterface;
 import net.cassiolandim.crosslasers.InputXY;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem;
 import net.cassiolandim.crosslasers.system.TimeSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem.Sound;
@@ -69,7 +68,6 @@ public class GhostComponent extends GameComponent {
         GameObject parentObject = (GameObject) parent;
         boolean timeToRelease = false;
         final InputGameInterface input = sSystemRegistry.inputGameInterface;
-        final CameraSystem camera = sSystemRegistry.cameraSystem;
 
         if (parentObject.life > 0) {
             
@@ -93,9 +91,6 @@ public class GhostComponent extends GameComponent {
             }
             
             parentObject.setCurrentAction(mTargetAction);
-            if (camera != null) {
-                camera.setTarget(parentObject);
-            }
             
             if (input != null) {
                 
@@ -168,11 +163,6 @@ public class GhostComponent extends GameComponent {
             player = manager.getPlayer();
         }
         
-        final CameraSystem camera = sSystemRegistry.cameraSystem;
-        if (camera != null) {
-            camera.setTarget(null);
-        }
-        
         if (player != null) {
             
             if (mKillOnRelease) {
@@ -186,15 +176,7 @@ public class GhostComponent extends GameComponent {
             }
             
             PlayerComponent control = player.findByClass(PlayerComponent.class);
-            if (camera.pointVisible(player.getPosition(), player.width)) {
-                control.deactivateGhost(0.0f);
-            } else {
-                control.deactivateGhost(mDelayOnRelease);
-            }
-           /* final InputSystem input = sSystemRegistry.inputSystem;
-            if (input != null) {
-                input.clearClickTriggered();
-            }*/
+            control.deactivateGhost(mDelayOnRelease);
         }
         
         if (mAmbientSoundStream > -1) {

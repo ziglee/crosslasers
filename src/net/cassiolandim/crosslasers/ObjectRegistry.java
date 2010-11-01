@@ -19,7 +19,6 @@ package net.cassiolandim.crosslasers;
 import java.util.ArrayList;
 
 import net.cassiolandim.crosslasers.component.GameObjectFactory;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.ChannelSystem;
 import net.cassiolandim.crosslasers.system.CollisionSystem;
 import net.cassiolandim.crosslasers.system.CustomToastSystem;
@@ -48,7 +47,6 @@ import net.cassiolandim.crosslasers.system.VibrationSystem;
 public class ObjectRegistry extends BaseObject {
 
     public BufferLibrary bufferLibrary;
-    public CameraSystem cameraSystem;
     public ChannelSystem channelSystem;
     public CollisionSystem collisionSystem;
     public ContextParameters contextParameters;

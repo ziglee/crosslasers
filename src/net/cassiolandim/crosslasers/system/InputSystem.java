@@ -72,7 +72,6 @@ public class InputSystem extends BaseObject {
 
         TimeSystem time = sSystemRegistry.timeSystem;
         mOrientationSensor.press(time.getGameTime(), correctedPitch, correctedRoll);
-        
     }
     
     public void keyDown(int keycode) {
@@ -108,7 +107,4 @@ public class InputSystem extends BaseObject {
 	public InputKeyboard getKeyboard() {
 		return mKeyboard;
 	}
-    
-    
-
 }

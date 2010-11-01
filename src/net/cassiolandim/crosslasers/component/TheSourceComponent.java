@@ -20,7 +20,6 @@ import net.cassiolandim.crosslasers.BaseObject;
 import net.cassiolandim.crosslasers.GameObject;
 import net.cassiolandim.crosslasers.GameObjectManager;
 import net.cassiolandim.crosslasers.GameObject.ActionType;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.ChannelSystem;
 import net.cassiolandim.crosslasers.system.HudSystem;
 
@@ -31,7 +30,6 @@ public class TheSourceComponent extends GameComponent {
 	private final static float EXPLOSION_TIME = 0.1f;
 	private final static float SHAKE_MAGNITUDE = 5.0f;
 	private final static float SHAKE_SCALE = 300.0f;
-	private final static float CAMERA_HIT_SHAKE_MAGNITUDE = 3.0f;
 
 	private final static float SINK_SPEED = -20.0f;
 	private float mTimer;
@@ -67,12 +65,9 @@ public class TheSourceComponent extends GameComponent {
 		GameObject parentObject = (GameObject)parent;
 		GameObject.ActionType currentAction = parentObject.getCurrentAction();
 
-		CameraSystem camera = sSystemRegistry.cameraSystem;
-
 		if (currentAction == ActionType.HIT_REACT) {
 			if (parentObject.life > 0) {
 				mTimer = SHAKE_TIME;
-				camera.shake(SHAKE_TIME, CAMERA_HIT_SHAKE_MAGNITUDE);
 				mShakeStartPosition = parentObject.getPosition().x;
 				parentObject.setCurrentAction(ActionType.IDLE); 
 				currentAction = ActionType.IDLE;
@@ -93,13 +88,8 @@ public class TheSourceComponent extends GameComponent {
 		mTimer -= timeDelta;
 
 		if (mDead) {
-			// Wait for the player to take the camera back, then steal it!
 			GameObjectManager manager = sSystemRegistry.gameObjectManager;
 
-			if (camera != null && manager != null && camera.getTarget() == manager.getPlayer()) {
-				camera.setTarget(parentObject);
-			}
-			
 			final float offset = SINK_SPEED * timeDelta;
 			parentObject.getPosition().y += offset;
 			

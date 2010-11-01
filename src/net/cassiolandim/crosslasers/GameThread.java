@@ -16,9 +16,7 @@
 
 package net.cassiolandim.crosslasers;
 
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem;
-
 import android.os.SystemClock;
 
 
@@ -67,14 +65,7 @@ public class GameThread implements Runnable {
     
                     mGameRoot.update(secondsDelta, null);
     
-                    CameraSystem camera = mGameRoot.sSystemRegistry.cameraSystem;
-                    float x = 0.0f;
-                    float y = 0.0f;
-                    if (camera != null) {
-                    	x = camera.getFocusPositionX();
-                    	y = camera.getFocusPositionY();
-                    }
-                    BaseObject.sSystemRegistry.renderSystem.swap(mRenderer, x, y);
+                    BaseObject.sSystemRegistry.renderSystem.swap(mRenderer);
                     
                     final long endTime = SystemClock.uptimeMillis();
                     

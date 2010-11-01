@@ -258,7 +258,7 @@ public class HudSystem extends BaseObject {
 	            Vector2 location = pool.allocate();
 	            location.set(FUEL_BAR_EDGE_PADDING, 
 	                    params.gameHeight - height - FUEL_BAR_EDGE_PADDING);
-	            render.scheduleForDraw(mFuelBackgroundDrawable, location, SortConstants.HUD, false);
+	            render.scheduleForDraw(mFuelBackgroundDrawable, location, SortConstants.HUD);
 	            location.x += 2;
 	            location.y += 2;
 	            final int barWidth = (int)((100 - 4) * mFuelPercent);
@@ -267,7 +267,7 @@ public class HudSystem extends BaseObject {
 		            if (bitmap != null) {
 		                bitmap.resize(barWidth, mFuelDrawable.getHeight());
 		                bitmap.setTexture(mFuelDrawable.getTexture());
-		                render.scheduleForDraw(bitmap, location, SortConstants.HUD + 1, false);
+		                render.scheduleForDraw(bitmap, location, SortConstants.HUD + 1);
 		            }
 	            }
 	          
@@ -290,7 +290,7 @@ public class HudSystem extends BaseObject {
 	                bitmap.resize(tex.width, tex.height);
 	            }
 	            
-	            render.scheduleForDraw(bitmap, mFlyButtonLocation, SortConstants.HUD, false);   
+	            render.scheduleForDraw(bitmap, mFlyButtonLocation, SortConstants.HUD);   
 	        }
 	        
 	        if (mStompButtonEnabledDrawable != null && mStompButtonDepressedDrawable != null) {
@@ -308,7 +308,7 @@ public class HudSystem extends BaseObject {
 	                bitmap.setHeight((int)(tex.height * STOMP_BUTTON_SCALE));
 	            }
 	            
-	            render.scheduleForDraw(bitmap, mStompButtonLocation, SortConstants.HUD, false);   
+	            render.scheduleForDraw(bitmap, mStompButtonLocation, SortConstants.HUD);   
 	        }
 	        
 	        if (mCoinDrawable != null) {
@@ -320,7 +320,7 @@ public class HudSystem extends BaseObject {
 	                mCoinLocation.y = params.gameHeight - tex.height - COLLECTABLE_EDGE_PADDING;
 	            }
 	            
-	            render.scheduleForDraw(mCoinDrawable, mCoinLocation, SortConstants.HUD, false);
+	            render.scheduleForDraw(mCoinDrawable, mCoinLocation, SortConstants.HUD);
 	            if (mCoinDigitsChanged) {
 	            	intToDigitArray(mCoinCount, mCoinDigits);
 	            	mCoinDigitsChanged = false;
@@ -339,7 +339,7 @@ public class HudSystem extends BaseObject {
 	                mRubyLocation.x = (params.gameWidth / 2.0f) + 100.0f;
 	                mRubyLocation.y = params.gameHeight - tex.height - COLLECTABLE_EDGE_PADDING;
 	            }
-	            render.scheduleForDraw(mRubyDrawable, mRubyLocation, SortConstants.HUD, false);
+	            render.scheduleForDraw(mRubyDrawable, mRubyLocation, SortConstants.HUD);
 	            if (mRubyDigitsChanged) {
 	            	intToDigitArray(mRubyCount, mRubyDigits);
 	            	mRubyDigitsChanged = false;
@@ -387,7 +387,7 @@ public class HudSystem extends BaseObject {
                     bitmap.setTexture(mFadeTexture);
                     bitmap.setCrop(0, mFadeTexture.height, mFadeTexture.width, mFadeTexture.height);
                     bitmap.setOpacity(opacityValue);
-                    render.scheduleForDraw(bitmap, Vector2.ZERO, SortConstants.FADE, false);
+                    render.scheduleForDraw(bitmap, Vector2.ZERO, SortConstants.FADE);
                 }
             }
             
@@ -423,7 +423,7 @@ public class HudSystem extends BaseObject {
         float offset = 0.0f;
         
         if (mXDrawable != null && drawX) {
-            render.scheduleForDraw(mXDrawable, location, SortConstants.HUD, false); 
+            render.scheduleForDraw(mXDrawable, location, SortConstants.HUD); 
             location.x += characterWidth;
             offset += characterWidth;
          }
@@ -432,7 +432,7 @@ public class HudSystem extends BaseObject {
             int index = digits[x];
             DrawableBitmap digit = mDigitDrawables[index];
             if (digit != null) {
-                render.scheduleForDraw(digit, location, SortConstants.HUD, false);
+                render.scheduleForDraw(digit, location, SortConstants.HUD);
                 location.x += characterWidth;
                 offset += characterWidth;
             }

@@ -512,15 +512,8 @@ public class AndouKun extends Activity implements SensorEventListener {
                }
                break;
                
-           case GameFlowEvent.EVENT_SHOW_DIARY:
-               Intent i = new Intent(this, DiaryActivity.class);
-               LevelTree.Level level = LevelTree.get(mLevelRow, mLevelIndex);
-               i.putExtra("text", level.dialogResources.diaryEntry);
-               startActivity(i);
-               break;
-               
            case GameFlowEvent.EVENT_SHOW_DIALOG_CHARACTER1:
-        	   i = new Intent(this, ConversationDialogActivity.class);
+        	   Intent i = new Intent(this, ConversationDialogActivity.class);
                i.putExtra("levelRow", mLevelRow);
                i.putExtra("levelIndex", mLevelIndex);
                i.putExtra("index", index);

@@ -24,7 +24,6 @@ import net.cassiolandim.crosslasers.Utils;
 import net.cassiolandim.crosslasers.Vector2;
 import net.cassiolandim.crosslasers.CollisionParameters.HitType;
 import net.cassiolandim.crosslasers.GameObject.ActionType;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.HudSystem;
 import net.cassiolandim.crosslasers.system.LevelSystem;
@@ -222,7 +221,6 @@ public class NPCComponent extends GameComponent {
     
     private boolean executeCommand(int hotSpot, GameObject parentObject, float timeDelta) {
     	boolean hitAccepted = true;
-    	final CameraSystem camera = sSystemRegistry.cameraSystem;
     	
     	switch(hotSpot) {
         case HotSpotSystem.HotSpotType.WAIT_SHORT:
@@ -279,20 +277,6 @@ public class NPCComponent extends GameComponent {
         		LevelSystem level = sSystemRegistry.levelSystem;
         		level.sendGameEvent(mDialogEvent, mDialogIndex, true);
         		mDialogEvent = GameFlowEvent.EVENT_INVALID;
-        	}
-        	break;
-        	
-        case HotSpotSystem.HotSpotType.TAKE_CAMERA_FOCUS: 
-        	if (camera != null) {
-        		camera.setTarget(parentObject);
-        	}
-        	break;
-        	
-        case HotSpotSystem.HotSpotType.RELEASE_CAMERA_FOCUS:
-
-        	if (camera != null) {
-        		GameObjectManager gameObjectManager = sSystemRegistry.gameObjectManager;
-        		camera.setTarget(gameObjectManager.getPlayer());
         	}
         	break;
         	

@@ -63,10 +63,10 @@ public class RenderSystem extends BaseObject {
         
     }
 
-    public void scheduleForDraw(DrawableObject object, Vector2 position, int priority, boolean cameraRelative) {
+    public void scheduleForDraw(DrawableObject object, Vector2 position, int priority) {
         RenderElement element = mElementPool.allocate();
         if (element != null) {
-            element.set(object, position, priority, cameraRelative);
+            element.set(object, position, priority);
             mRenderQueues[mQueueIndex].add(element);
         }
     }
@@ -83,11 +83,11 @@ public class RenderSystem extends BaseObject {
         
     }
     
-    public void swap(GameRenderer renderer, float cameraX, float cameraY) {
+    public void swap(GameRenderer renderer) {
         mRenderQueues[mQueueIndex].commitUpdates();
         
         // This code will block if the previous queue is still being executed.
-        renderer.setDrawQueue(mRenderQueues[mQueueIndex], cameraX, cameraY); 
+        renderer.setDrawQueue(mRenderQueues[mQueueIndex]); 
     
         final int lastQueue = (mQueueIndex == 0) ? DRAW_QUEUE_COUNT - 1 : mQueueIndex - 1;
     
@@ -100,12 +100,11 @@ public class RenderSystem extends BaseObject {
     
     /* Empties all draw queues and disconnects the game thread from the renderer. */
     public void emptyQueues(GameRenderer renderer) {
-        renderer.setDrawQueue(null, 0.0f, 0.0f); 
+        renderer.setDrawQueue(null); 
         for (int x = 0; x < DRAW_QUEUE_COUNT; x++) {
             mRenderQueues[x].commitUpdates();
             FixedSizeArray<BaseObject> objects = mRenderQueues[x].getObjects();
             clearQueue(objects);
-        
         }
     }
 
@@ -114,11 +113,10 @@ public class RenderSystem extends BaseObject {
             super();
         }
 
-        public void set(DrawableObject drawable, Vector2 position, int priority, boolean isCameraRelative) {
+        public void set(DrawableObject drawable, Vector2 position, int priority) {
             mDrawable = drawable;
             x = position.x;
             y = position.y;
-            cameraRelative = isCameraRelative;
             final int sortBucket = priority * TEXTURE_SORT_BUCKET_SIZE;
             int sortOffset = 0;
             if (drawable != null) {
@@ -134,13 +132,11 @@ public class RenderSystem extends BaseObject {
             mDrawable = null;
             x = 0.0f;
             y = 0.0f;
-            cameraRelative = false;
         }
 
         public DrawableObject mDrawable;
         public float x;
         public float y;
-        public boolean cameraRelative;
     }
 
     protected class RenderElementPool extends TObjectPool<RenderElement> {

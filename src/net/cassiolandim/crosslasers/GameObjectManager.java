@@ -19,7 +19,6 @@ package net.cassiolandim.crosslasers;
 import java.util.Comparator;
 
 import net.cassiolandim.crosslasers.component.GameObjectFactory;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 
 
 /** 
@@ -36,28 +35,22 @@ import net.cassiolandim.crosslasers.system.CameraSystem;
  */
 public class GameObjectManager extends ObjectManager {
     private static final int MAX_GAME_OBJECTS = 384;
-    private float mMaxActivationRadius;
     private final static HorizontalPositionComparator sGameObjectComparator 
         = new HorizontalPositionComparator();
     private FixedSizeArray<BaseObject> mInactiveObjects;
     private FixedSizeArray<GameObject> mMarkedForDeathObjects;
     private GameObject mPlayer;
     private boolean mVisitingGraph;
-    private Vector2 mCameraFocus;
    
         
     public GameObjectManager(float maxActivationRadius) {
         super(MAX_GAME_OBJECTS);
-        mMaxActivationRadius = maxActivationRadius;
         
         mInactiveObjects = new FixedSizeArray<BaseObject>(MAX_GAME_OBJECTS);
         mInactiveObjects.setComparator(sGameObjectComparator);
         
         mMarkedForDeathObjects = new FixedSizeArray<GameObject>(MAX_GAME_OBJECTS);
         mVisitingGraph = false;
-        
-        mCameraFocus = new Vector2();
-        
     }
     
     @Override
@@ -79,9 +72,6 @@ public class GameObjectManager extends ObjectManager {
     public void update(float timeDelta, BaseObject parent) {
         commitUpdates();
         
-        CameraSystem camera = sSystemRegistry.cameraSystem;
-        
-        mCameraFocus.set(camera.getFocusPositionX(), camera.getFocusPositionY());
         mVisitingGraph = true;
         FixedSizeArray<BaseObject> objects = getObjects();
         final int count = objects.getCount();
@@ -90,23 +80,7 @@ public class GameObjectManager extends ObjectManager {
             final Object[] objectArray = objects.getArray();
             for (int i = count - 1; i >= 0; i--) {
                 GameObject gameObject = (GameObject)objectArray[i];
-                final float distance2 = mCameraFocus.distance2(gameObject.getPosition());
-                if (distance2 < (gameObject.activationRadius * gameObject.activationRadius)
-                        || gameObject.activationRadius == -1) {
-                    gameObject.update(timeDelta, this);
-                } else {
-                	// Remove the object from the list.
-                	// It's safe to just swap the current object with the last
-                	// object because this list is being iterated backwards, so 
-                	// the last object in the list has already been processed.
-                	objects.swapWithLast(i);
-                    objects.removeLast();
-                    if (gameObject.destroyOnDeactivation) {
-                        mMarkedForDeathObjects.add(gameObject);
-                    } else {
-                        mInactiveObjects.add((BaseObject)gameObject);
-                    }
-                }
+                gameObject.update(timeDelta, this);
             }
         }
         
@@ -116,20 +90,10 @@ public class GameObjectManager extends ObjectManager {
             final Object[] inactiveArray = mInactiveObjects.getArray();
             for (int i = inactiveCount - 1; i >= 0; i--) {
                 GameObject gameObject = (GameObject)inactiveArray[i];
-                
-                final Vector2 position = gameObject.getPosition();
-                final float distance2 = mCameraFocus.distance2(position);
-                final float xDistance = position.x - mCameraFocus.x;
-                if (distance2 < (gameObject.activationRadius * gameObject.activationRadius) 
-                        || gameObject.activationRadius == -1) {
-                    gameObject.update(timeDelta, this);
-                    mInactiveObjects.swapWithLast(i);
-                    mInactiveObjects.removeLast();
-                    objects.add(gameObject);
-                } else if (xDistance < -mMaxActivationRadius) {
-                    // We've passed the focus, we can stop processing now
-                    break;   
-                }
+                gameObject.update(timeDelta, this);
+                mInactiveObjects.swapWithLast(i);
+                mInactiveObjects.removeLast();
+                objects.add(gameObject);
             }
         }
         mVisitingGraph = false;

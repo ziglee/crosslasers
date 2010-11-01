@@ -17,11 +17,9 @@
 package net.cassiolandim.crosslasers.component;
 
 import net.cassiolandim.crosslasers.BaseObject;
-import net.cassiolandim.crosslasers.ContextParameters;
 import net.cassiolandim.crosslasers.DrawableObject;
 import net.cassiolandim.crosslasers.GameObject;
 import net.cassiolandim.crosslasers.Vector2;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.RenderSystem;
 
 
@@ -33,11 +31,10 @@ import net.cassiolandim.crosslasers.system.RenderSystem;
  * the origin at the lower-left corner of the display).
  */
 public class RenderComponent extends GameComponent {
-    private DrawableObject mDrawable;
+
+	private DrawableObject mDrawable;
     private int mPriority;
-    private boolean mCameraRelative;
     private Vector2 mPositionWorkspace;
-    private Vector2 mScreenLocation;
     private Vector2 mDrawOffset;
     
     public RenderComponent() {
@@ -45,7 +42,6 @@ public class RenderComponent extends GameComponent {
         setPhase(ComponentPhases.DRAW.ordinal());
         
         mPositionWorkspace = new Vector2();
-        mScreenLocation = new Vector2();
         mDrawOffset = new Vector2();
         reset();
     }
@@ -53,7 +49,6 @@ public class RenderComponent extends GameComponent {
     @Override
     public void reset() {
         mPriority = 0;
-        mCameraRelative = true;
         mDrawable = null;
         mDrawOffset.zero();
     }
@@ -63,28 +58,9 @@ public class RenderComponent extends GameComponent {
             RenderSystem system = sSystemRegistry.renderSystem;
             if (system != null) {
                 mPositionWorkspace.set(((GameObject)parent).getPosition());
-                mPositionWorkspace.add(mDrawOffset);
-                if (mCameraRelative) {
-                    CameraSystem camera = sSystemRegistry.cameraSystem;
-                    ContextParameters params = sSystemRegistry.contextParameters;
-                    mScreenLocation.x = (mPositionWorkspace.x - camera.getFocusPositionX()
-                                    + (params.gameWidth / 2));
-                    mScreenLocation.y = (mPositionWorkspace.y - camera.getFocusPositionY()
-                                    + (params.gameHeight / 2));
-                }
-                // It might be better not to do culling here, as doing it in the render thread
-                // would allow us to have multiple views into the same scene and things like that.
-                // But at the moment significant CPU is being spent on sorting the list of objects
-                // to draw per frame, so I'm going to go ahead and cull early.
-                if (mDrawable.visibleAtPosition(mScreenLocation)) {
-                    system.scheduleForDraw(mDrawable, mPositionWorkspace, mPriority, mCameraRelative);
-                } else if (mDrawable.getParentPool() != null) {
-                    // Normally the render system releases drawable objects back to the factory
-                    // pool, but in this case we're short-circuiting the render system, so we
-                    // need to release the object manually.
-                    sSystemRegistry.drawableFactory.release(mDrawable);
-                    mDrawable = null;
-                }
+                //mPositionWorkspace.add(mDrawOffset);
+                
+                system.scheduleForDraw(mDrawable, mPositionWorkspace, mPriority);
             }
         }
     }
@@ -105,10 +81,6 @@ public class RenderComponent extends GameComponent {
         return mPriority;
     }
 
-    public void setCameraRelative(boolean relative) {
-        mCameraRelative = relative;
-    }
-    
     public void setDrawOffset(float x, float y) {
         mDrawOffset.set(x, y);
     }

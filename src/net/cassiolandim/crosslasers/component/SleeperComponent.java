@@ -19,7 +19,6 @@ package net.cassiolandim.crosslasers.component;
 import net.cassiolandim.crosslasers.BaseObject;
 import net.cassiolandim.crosslasers.GameObject;
 import net.cassiolandim.crosslasers.GameObject.ActionType;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 
 
 /**
@@ -67,14 +66,11 @@ public class SleeperComponent extends GameComponent {
             mState = STATE_SLEEPING;
         }
         
-        CameraSystem camera = sSystemRegistry.cameraSystem;
         switch(mState) {
             case STATE_SLEEPING:
-                if (camera.shaking() && camera.pointVisible(parentObject.getPosition(), parentObject.width / 2.0f)) {
-                    mState = STATE_WAKING;
-                    mStateTime = mWakeUpDuration;
-                    parentObject.setCurrentAction(GameObject.ActionType.MOVE);
-                } 
+                mState = STATE_WAKING;
+                mStateTime = mWakeUpDuration;
+                parentObject.setCurrentAction(GameObject.ActionType.MOVE);
                 break;
             case STATE_WAKING:
                 mStateTime -= timeDelta;
@@ -88,17 +84,13 @@ public class SleeperComponent extends GameComponent {
             case STATE_ATTACKING:
                 if (parentObject.touchingGround() && parentObject.getVelocity().y < 0.0f) {
                     mState = STATE_SLAM;
-                    camera.shake(mSlamDuration, mSlamMagnitude);
                     parentObject.getVelocity().zero();
                 }
                 break;
             case STATE_SLAM:
-                if (!camera.shaking()) {
-                    mState = STATE_SLEEPING;
-                    parentObject.setCurrentAction(GameObject.ActionType.IDLE);
-                }
+                mState = STATE_SLEEPING;
+                parentObject.setCurrentAction(GameObject.ActionType.IDLE);
                 break;
-                
         }
     }
 

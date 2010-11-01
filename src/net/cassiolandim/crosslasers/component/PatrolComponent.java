@@ -23,7 +23,6 @@ import net.cassiolandim.crosslasers.GameObjectManager;
 import net.cassiolandim.crosslasers.Utils;
 import net.cassiolandim.crosslasers.Vector2;
 import net.cassiolandim.crosslasers.GameObject.ActionType;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.TimeSystem;
 import net.cassiolandim.crosslasers.system.HotSpotSystem.HotSpotType;
@@ -213,12 +212,9 @@ public class PatrolComponent extends GameComponent {
         final float gameTime = time.getGameTime();
         
         boolean visible = true;
-        CameraSystem camera = sSystemRegistry.cameraSystem;
         ContextParameters context = sSystemRegistry.contextParameters;
-        final float dx = 
-            Math.abs(parentObject.getCenteredPositionX() - camera.getFocusPositionX());
-        final float dy = 
-            Math.abs(parentObject.getCenteredPositionY() - camera.getFocusPositionY());
+        final float dx = Math.abs(parentObject.getCenteredPositionX());
+        final float dy = Math.abs(parentObject.getCenteredPositionY());
         if (dx > context.gameWidth / 2.0f || dy > context.gameHeight / 2.0f) {
             visible = false;
         }

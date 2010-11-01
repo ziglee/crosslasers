@@ -30,7 +30,6 @@ import net.cassiolandim.crosslasers.Vector2;
 import net.cassiolandim.crosslasers.VectorPool;
 import net.cassiolandim.crosslasers.CollisionParameters.HitType;
 import net.cassiolandim.crosslasers.GameObject.ActionType;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.HudSystem;
 import net.cassiolandim.crosslasers.system.TimeSystem;
@@ -370,11 +369,7 @@ public class PlayerComponent extends GameComponent {
                         
                         manager.add(ghost);
                         mGhostActive = true;
-                        CameraSystem camera = sSystemRegistry.cameraSystem;
-                        if (camera != null) {
-                            camera.setTarget(ghost);
-                        }
-                                            }
+                    }
                 } 
             } else if (!attackButton.getPressed()) {
                 mGhostChargeTime = 0.0f;
@@ -405,10 +400,6 @@ public class PlayerComponent extends GameComponent {
         
         if (mTouchingGround && mTimer2 < 0.0f) {
             mTimer2 = time;
-            CameraSystem camera = sSystemRegistry.cameraSystem;
-            if (camera != null) {
-                camera.shake(STOMP_DELAY_TIME, STOMP_SHAKE_MAGNITUDE);
-            }
             VibrationSystem vibrator = sSystemRegistry.vibrationSystem;
             
             if (vibrator != null) {
@@ -528,12 +519,6 @@ public class PlayerComponent extends GameComponent {
     
     protected void statePostGhostDelay(float time, float timeDelta, GameObject parentObject) {
         if (time > mGhostDeactivatedTime) {
-            if (!mGhostActive) { // The ghost might have activated again during this delay.
-                CameraSystem camera = sSystemRegistry.cameraSystem;
-                if (camera != null) {
-                    camera.setTarget(parentObject);
-                }
-            }
             gotoMove(parentObject);
         }
     }

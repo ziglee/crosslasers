@@ -21,7 +21,6 @@ import net.cassiolandim.crosslasers.ContextParameters;
 import net.cassiolandim.crosslasers.GameObject;
 import net.cassiolandim.crosslasers.GameObjectManager;
 import net.cassiolandim.crosslasers.Vector2;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem.Sound;
@@ -86,12 +85,9 @@ public class LifetimeComponent extends GameComponent {
         }
         
         if (mDieWhenInvisible) {
-            CameraSystem camera = sSystemRegistry.cameraSystem;
             ContextParameters context = sSystemRegistry.contextParameters;
-            final float dx = 
-                Math.abs(parentObject.getPosition().x - camera.getFocusPositionX());
-            final float dy = 
-                Math.abs(parentObject.getPosition().y - camera.getFocusPositionY());
+            final float dx = Math.abs(parentObject.getPosition().x);
+            final float dy = Math.abs(parentObject.getPosition().y);
             if (dx > context.gameWidth || dy > context.gameHeight) {
                 // the position of this object is off the screen, destroy!
                 // TODO: this is a pretty dumb test.  We should have a bounding volume instead.

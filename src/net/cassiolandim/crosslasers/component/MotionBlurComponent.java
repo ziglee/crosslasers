@@ -110,7 +110,7 @@ public class MotionBlurComponent extends GameComponent {
 					stepImage.setOpacity(opacity);
 					
 	             
-                    renderer.scheduleForDraw(stepImage, record.position, mTargetPriority - (x + 1), true);
+                    renderer.scheduleForDraw(stepImage, record.position, mTargetPriority - (x + 1));
 				}
 			}
 		}

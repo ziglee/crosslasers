@@ -58,9 +58,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private Game mGame;
     private Object mDrawLock;
     
-    float mCameraX;
-    float mCameraY;
-    
     boolean mCallbackRequested;
         
     public GameRenderer(Context context, Game game, int gameWidth, int gameHeight) {
@@ -74,8 +71,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         mScaleY = 1.0f;
         mDrawQueueChanged = false;
         mDrawLock = new Object();
-        mCameraX = 0.0f;
-        mCameraY = 0.0f;
         mCallbackRequested = false;
     }
 
@@ -220,10 +215,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
                     RenderElement element = (RenderElement)objectArray[i];
                     float x = element.x;
                     float y = element.y;
-                    if (element.cameraRelative) {
-                    	x = (x - mCameraX) + halfWidth;
-                    	y = (y - mCameraY) + halfHeight;
-                    }
                     element.mDrawable.draw(x, y, scaleX, scaleY);
                 }
                 OpenGLSystem.setGL(null);
@@ -294,10 +285,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         mGame.onSurfaceReady();
     }
 
-    public synchronized void setDrawQueue(ObjectManager queue, float cameraX, float cameraY) {
+    public synchronized void setDrawQueue(ObjectManager queue) {
 		mDrawQueue = queue;
-		mCameraX = cameraX;
-		mCameraY = cameraY;
     	synchronized(mDrawLock) {
     		mDrawQueueChanged = true;
     		mDrawLock.notify();

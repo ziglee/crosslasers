@@ -66,13 +66,10 @@ public final class DebugSystem extends BaseObject {
 	public void drawShape(float x, float y, float width, float height, int shapeType, int colorType) {
         final RenderSystem render = sSystemRegistry.renderSystem;
         final DrawableFactory factory = sSystemRegistry.drawableFactory;
-        CameraSystem camera = sSystemRegistry.cameraSystem;
         ContextParameters params = sSystemRegistry.contextParameters;
         mWorkVector.set(x, y);
-        mWorkVector.x = (mWorkVector.x - camera.getFocusPositionX()
-                        + (params.gameWidth / 2));
-        mWorkVector.y = (mWorkVector.y - camera.getFocusPositionY()
-                        + (params.gameHeight / 2));
+        mWorkVector.x = (mWorkVector.x + (params.gameWidth / 2));
+        mWorkVector.y = (mWorkVector.y + (params.gameHeight / 2));
 
         if (mWorkVector.x + width >= 0.0f && mWorkVector.x < params.gameWidth 
                 && mWorkVector.y + height >= 0.0f && mWorkVector.y < params.gameHeight) {
@@ -86,7 +83,7 @@ public final class DebugSystem extends BaseObject {
 	            bitmap.setTexture(texture);
 	            mWorkVector.set(x, y);
 
-	            render.scheduleForDraw(bitmap, mWorkVector, SortConstants.HUD, true);
+	            render.scheduleForDraw(bitmap, mWorkVector, SortConstants.HUD);
 	        }
         }
 	}

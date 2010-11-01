@@ -22,7 +22,6 @@ import net.cassiolandim.crosslasers.ScrollableBitmap;
 import net.cassiolandim.crosslasers.Texture;
 import net.cassiolandim.crosslasers.TiledBackgroundVertexGrid;
 import net.cassiolandim.crosslasers.TiledVertexGrid;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 
 
 /**
@@ -31,13 +30,10 @@ import net.cassiolandim.crosslasers.system.CameraSystem;
  * to allocate fire-and-forget drawable objects every frame.
  */
 public class ScrollerComponent extends GameComponent {
+	
     private int mWidth;
     private int mHeight;
-    private float mHalfWidth;
-    private float mHalfHeight;
     private RenderComponent mRenderComponent;
-    private float mSpeedX;
-    private float mSpeedY;
     private Texture mTexture;
     private TiledVertexGrid mVertGrid;
     
@@ -67,27 +63,14 @@ public class ScrollerComponent extends GameComponent {
     public void reset() {
         mWidth = 0;
         mHeight = 0;
-        mHalfWidth = 0.0f;
-        mHalfHeight = 0.0f;
         mRenderComponent = null;
-        mSpeedX = 0.0f;
-        mSpeedY = 0.0f;
         mTexture = null;
         mVertGrid = null;
     }
     
-    public void setScrollSpeed(float speedX, float speedY) {
-        mSpeedX = speedX;
-        mSpeedY = speedY;
-    }
-    
     public void setup(float speedX, float speedY, int width, int height) {
-        mSpeedX = speedX;
-        mSpeedY = speedY;
         mWidth = width;
         mHeight = height;
-        mHalfWidth = sSystemRegistry.contextParameters.gameWidth / 2.0f; //width / 2.0f;
-        mHalfHeight = sSystemRegistry.contextParameters.gameHeight / 2.0f; //height / 2.0f;
     }
     
     public void setUseTexture(Texture texture) {
@@ -110,16 +93,7 @@ public class ScrollerComponent extends GameComponent {
 
             background.setWidth(mWidth);
             background.setHeight(mHeight);
-
-            CameraSystem camera = sSystemRegistry.cameraSystem;
-
-            float originX = camera.getFocusPositionX() - mHalfWidth;
-            float originY = camera.getFocusPositionY() - mHalfHeight;
-
-            originX *= mSpeedX;
-            originY *= mSpeedY;
-
-            background.setScrollOrigin(originX, originY);
+            background.setScrollOrigin(0, 300);
             mRenderComponent.setDrawable(background);
         }
     }

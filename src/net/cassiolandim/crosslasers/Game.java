@@ -18,7 +18,6 @@ package net.cassiolandim.crosslasers;
 
 import net.cassiolandim.crosslasers.activity.AndouKun;
 import net.cassiolandim.crosslasers.component.GameObjectFactory;
-import net.cassiolandim.crosslasers.system.CameraSystem;
 import net.cassiolandim.crosslasers.system.ChannelSystem;
 import net.cassiolandim.crosslasers.system.CollisionSystem;
 import net.cassiolandim.crosslasers.system.CustomToastSystem;
@@ -31,8 +30,6 @@ import net.cassiolandim.crosslasers.system.RenderSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem;
 import net.cassiolandim.crosslasers.system.TimeSystem;
 import net.cassiolandim.crosslasers.system.VibrationSystem;
-
-
 import android.content.Context;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -137,17 +134,9 @@ public class Game extends AllocationGuard {
             BaseObject.sSystemRegistry.channelSystem = new ChannelSystem();
             BaseObject.sSystemRegistry.registerForReset(BaseObject.sSystemRegistry.channelSystem);
             
-            CameraSystem camera = new CameraSystem();
-            BaseObject.sSystemRegistry.cameraSystem = camera;
-            BaseObject.sSystemRegistry.registerForReset(camera);
-    
             collision.loadCollisionTiles(context.getResources().openRawResource(R.raw.collision));
     
             gameRoot.add(gameManager);
-            
-            // Camera must come after the game manager so that the camera
-            // target moves before the camera centers.
-            gameRoot.add(camera);
     
             // More basic systems.
             
