@@ -75,9 +75,6 @@ public class HotSpotSystem extends BaseObject {
         public static final int NPC_SELECT_DIALOG_2_3 = 40;
         public static final int NPC_SELECT_DIALOG_2_4 = 41;
         public static final int NPC_SELECT_DIALOG_2_5 = 42;
-        
-
-
     }
     
     public HotSpotSystem() {

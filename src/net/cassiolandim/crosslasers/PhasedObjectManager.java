@@ -24,6 +24,7 @@ import java.util.Comparator;
  * Sorting is performed on add.
  */
 public class PhasedObjectManager extends ObjectManager {
+	
     private final static PhasedObjectComparator sPhasedObjectComparator 
         = new PhasedObjectComparator();
     private boolean mDirty;

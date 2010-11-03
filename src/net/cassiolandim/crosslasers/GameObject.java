@@ -27,7 +27,9 @@ import net.cassiolandim.crosslasers.system.TimeSystem;
  * components can use to share state (direct component-to-component communication is discouraged).
  */
 public class GameObject extends PhasedObjectManager {
+	
     private final static float COLLISION_SURFACE_DECAY_TIME = 0.3f;
+    
     // These fields are managed by components.
     private Vector2 mPosition;
     private Vector2 mVelocity;

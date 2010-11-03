@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import net.cassiolandim.crosslasers.R;
 
 public class MainMenuActivity extends Activity {
+	
     private boolean mPaused;
     private View mStartButton;
     private View mOptionsButton;
@@ -103,7 +104,6 @@ public class MainMenuActivity extends Activity {
         
         if (!LevelTree.isLoaded()) {
         	LevelTree.loadLevelTree(R.xml.level_tree, this);
-        	LevelTree.loadAllDialog(this);
         }
         
         mTicker = findViewById(R.id.ticker);
@@ -141,9 +141,8 @@ public class MainMenuActivity extends Activity {
             
             // Change "start" to "continue" if there's a saved game.
             SharedPreferences prefs = getSharedPreferences(AndouKun.PREFERENCE_NAME, MODE_PRIVATE);
-            final int row = prefs.getInt(AndouKun.PREFERENCE_LEVEL_ROW, 0);
             final int index = prefs.getInt(AndouKun.PREFERENCE_LEVEL_INDEX, 0);
-            if (row != 0 || index != 0) {
+            if (index != 0) {
             	((ImageView)mStartButton).setImageDrawable(getResources().getDrawable(R.drawable.ui_button_continue));
             } else {
             	((ImageView)mStartButton).setImageDrawable(getResources().getDrawable(R.drawable.ui_button_start));

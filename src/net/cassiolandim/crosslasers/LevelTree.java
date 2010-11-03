@@ -25,43 +25,38 @@ import android.content.res.XmlResourceParser;
 
 public final class LevelTree {
 
-	public static class LevelGroup {
-		public ArrayList<Level> levels = new ArrayList<Level>();
-	}
-	
     public static class Level {
-    	public int resource;
-        public DialogEntry dialogResources;
+    	public Long index;
         public String name;
-        public String timeStamp;
         public boolean completed;
-        public boolean inThePast;
-        public boolean restartable;
+        public ArrayList<EnemyEntry> enemyEntries = new ArrayList<EnemyEntry>();
         
-        public Level(int level, DialogEntry dialogs, String title, String time, 
-        		boolean pastEvent, boolean restartOnDeath, boolean waitMessage) {
-            resource = level;
-            dialogResources = dialogs;
-            name = title;
-            timeStamp = time;
-            completed = false;
-            inThePast = pastEvent;
-            restartable = restartOnDeath;
+        public Level(Long index, String title) {
+        	this.index = index;
+        	this.name = title;
+        	this.completed = false;
         }
     }
     
-    public static class DialogEntry {
-        public int diaryEntry = 0;
-        public int character1Entry = 0;
-        public int character2Entry = 0;
-        public ArrayList<ConversationUtils.Conversation> character1Conversations;
-        public ArrayList<ConversationUtils.Conversation> character2Conversations;
+    public static class EnemyEntry {
+    	public Integer type = 0;
+    	public Integer quantity = 0;
+    	public Long spawnDelay = 0L;
+    	public Long minInterval = 0L;
+    	
+    	public EnemyEntry(Integer type, Integer quantity, Long spawnDelay, Long minInterval){
+    		this.type = type;
+    		this.quantity = quantity;
+    		this.spawnDelay = spawnDelay;
+    		this.minInterval = minInterval;
+    	}
     }
-    public final static ArrayList<LevelGroup> levels = new ArrayList<LevelGroup>();
+    
+    public final static ArrayList<Level> levels = new ArrayList<Level>();
     private static boolean mLoaded = false;
     
-    public static final Level get(int row, int index) {
-    	return levels.get(row).levels.get(index);
+    public static final Level get(int index) {
+    	return levels.get(index);
     }
     
     public static final boolean isLoaded() {
@@ -69,113 +64,55 @@ public final class LevelTree {
     }
     
     public static final void loadLevelTree(int resource, Context context) {
-        if (levels.size() > 0) {
-        	// already loaded
-        	return;
-        }
+        if (mLoaded) return;
         
     	XmlResourceParser parser = context.getResources().getXml(resource);
         
         levels.clear();
         
-        LevelGroup currentGroup = null;
         Level currentLevel = null;
-        DialogEntry currentDialog = null;
         
         try { 
             int eventType = parser.getEventType(); 
             while (eventType != XmlPullParser.END_DOCUMENT) { 
                 if(eventType == XmlPullParser.START_TAG) { 
-                	if (parser.getName().equals("group")) {
-                		currentGroup = new LevelGroup();
-                		levels.add(currentGroup);
-                		currentLevel = null;
-                		currentDialog = null;
-                	}
-                	
-                    if (parser.getName().equals("level") && currentGroup != null) { 
-                    	int levelResource = 0;
+                    if (parser.getName().equals("level")) { 
                     	String titleString = null;
-                    	String timeStamp = null;
-                    	boolean inThePast = false;
-                    	boolean restartable = true;
-                    	boolean showWaitMessage = false;
-                        for(int i=0; i < parser.getAttributeCount(); i++) { 
-                    		if (parser.getAttributeName(i).equals("past")) {
-                    			if (parser.getAttributeValue(i).equals("true")) {
-                    				inThePast = true;
-                    			}
-                    		} else if (parser.getAttributeName(i).equals("restartable")) {
-                    			if (parser.getAttributeValue(i).equals("false")) {
-                    				restartable = false;
-                    			}
-                    		} else if (parser.getAttributeName(i).equals("waitmessage")) {
-                    			if (parser.getAttributeValue(i).equals("true")) {
-                    				showWaitMessage = true;
-                    			}
-                    		} else {
-                                final int value = parser.getAttributeResourceValue(i, -1);
-                                if (value != -1) {
-                                    if (parser.getAttributeName(i).equals("resource")) {
-                                        levelResource = value;
-                                    }
-                                    if (parser.getAttributeName(i).equals("title")) {
-                                        titleString = context.getString(value);
-                                    } else if (parser.getAttributeName(i).equals("time")) {
-                                        timeStamp = context.getString(value);
-                                    }
-                                }
+                    	Long index = null;
+                        for(int i = 0; i < parser.getAttributeCount(); i++) { 
+                    		if (parser.getAttributeName(i).equals("index")) {
+                				index = Long.getLong(parser.getAttributeValue(i));
                     		}
-                        	
+                    		if (parser.getAttributeName(i).equals("title")) {
+                				titleString = parser.getAttributeValue(i);
+                    		}
                         } 
-                        currentDialog = null;
-                        currentLevel = new Level(levelResource, null, titleString, timeStamp, inThePast, restartable, showWaitMessage);
-                        currentGroup.levels.add(currentLevel);
-                    } 
-                    
-                    if (parser.getName().equals("dialog") && currentLevel != null) { 
-                    	currentDialog = new DialogEntry();
-                    	currentLevel.dialogResources = currentDialog;
+                        currentLevel = new Level(index, titleString);
+                        levels.add(currentLevel);
                     }
                     
-                    if (parser.getName().equals("diary") && currentDialog != null) { 
-                    	
-                    	for(int i=0; i < parser.getAttributeCount(); i++) { 
-                            final int value = parser.getAttributeResourceValue(i, -1);
-                            if (value != -1) {
-                                if (parser.getAttributeName(i).equals("resource")) {
-                                	currentDialog.diaryEntry = value;
-                                }
-                               
-                            }
-                    	} 
+                    if (parser.getName().equals("enemy") && currentLevel != null) {
+                    	Integer type = null;
+                    	Integer quantity = null;
+                    	Long spawnDelay = null;
+                    	Long minInterval = null;
+                    	for(int i = 0; i < parser.getAttributeCount(); i++) { 
+                    		if (parser.getAttributeName(i).equals("type")) {
+                    			type = Integer.getInteger(parser.getAttributeValue(i));
+                    		}
+                    		if (parser.getAttributeName(i).equals("quantity")) {
+                    			quantity = Integer.getInteger(parser.getAttributeValue(i));
+                    		}
+                    		if (parser.getAttributeName(i).equals("spawnDelay")) {
+                    			spawnDelay = Long.getLong(parser.getAttributeValue(i));
+                    		}
+                    		if (parser.getAttributeName(i).equals("minInterval")) {
+                    			minInterval = Long.getLong(parser.getAttributeValue(i));
+                    		}
+                        }
+                    	EnemyEntry enemyEntry = new EnemyEntry(type, quantity, spawnDelay, minInterval);
+                    	currentLevel.enemyEntries.add(enemyEntry);
                     }
-                    
-                    if (parser.getName().equals("character1") && currentDialog != null) { 
-                    	for(int i=0; i < parser.getAttributeCount(); i++) { 
-                            final int value = parser.getAttributeResourceValue(i, -1);
-                            if (value != -1) {
-                                if (parser.getAttributeName(i).equals("resource")) {
-                                	currentDialog.character1Entry = value;
-                                }
-                               
-                            }
-                    	} 
-                    }
-                    
-                    if (parser.getName().equals("character2") && currentDialog != null) { 
-                    	
-                    	for(int i=0; i < parser.getAttributeCount(); i++) { 
-                            final int value = parser.getAttributeResourceValue(i, -1);
-                            if (value != -1) {
-                                if (parser.getAttributeName(i).equals("resource")) {
-                                	currentDialog.character2Entry = value;
-                                }
-                               
-                            }
-                    	}
-                    }
-                    
                 } 
                 eventType = parser.next(); 
             } 
@@ -187,80 +124,32 @@ public final class LevelTree {
         mLoaded = true;
     }
     
-    public final static void loadAllDialog(Context context) {
-    	final int levelGroupCount = levels.size();
-    	for (int x = 0; x < levelGroupCount; x++) {
-    		final ArrayList<Level> row = levels.get(x).levels;
-    		final int levelCount = row.size();
-    		for (int y = 0; y < levelCount; y++) {
-    			final Level level = row.get(y);
-    			if (level != null && level.dialogResources != null) {
-    				DialogEntry dialog = level.dialogResources;
-    				if (dialog.character1Entry != 0) {
-    					dialog.character1Conversations = ConversationUtils.loadDialog(dialog.character1Entry, context);
-    				}
-    				
-    				if (dialog.character2Entry != 0) {
-    					dialog.character2Conversations = ConversationUtils.loadDialog(dialog.character2Entry, context);
-    				}
-    			}
-    		}
-    		
-    	}
-    }
-
-	public final static void updateCompletedState(int levelRow, int completedLevels) {
-		final int rowCount = levels.size();
-		for (int x = 0; x < rowCount; x++) {
-			final LevelGroup group = levels.get(x);
-			final int levelCount = group.levels.size();
-			for (int y = 0; y < levelCount; y++) {
-				final Level level = group.levels.get(y);
-				if (x < levelRow) {
+	public final static void updateCompletedState(int levelIndex, int completedLevels) {
+		final int indexCount = levels.size();
+		for (int x = 0; x < indexCount; x++) {
+			final Level level = levels.get(x);
+			if (x < levelIndex) {
+				level.completed = true;
+			} else if (x == levelIndex) {
+				if ((completedLevels & (1 << x)) != 0) {
 					level.completed = true;
-				} else if (x == levelRow) {
-					if ((completedLevels & (1 << y)) != 0) {
-						level.completed = true;
-					}
-				} else {
-					level.completed = false;
 				}
+			} else {
+				level.completed = false;
 			}
 		}
-		
 	}
 
-	public final static int packCompletedLevels(int levelRow) {
+	public final static int packCompletedLevels(int levelIndex) {
 		int completed = 0;
-		final LevelGroup group = levels.get(levelRow);
-		final int levelCount = group.levels.size();
-		for (int y = 0; y < levelCount; y++) {
-			final Level level = group.levels.get(y);
-			if (level.completed) {
-				completed |= 1 << y;
-			}
+		final Level level = levels.get(levelIndex);
+		if (level.completed) {
+			completed |= 1 << levelIndex;
 		}
 		return completed;
 	}
 
-	public static boolean levelIsValid(int row, int index) {
-		boolean valid = false;
-		if (row >= 0 && row < levels.size()) {
-			final LevelGroup group = levels.get(row);
-			if (index >=0 && index < group.levels.size()) {
-				valid = true;
-			}
-		}
-		
-		return valid;
-	}
-	
-	public static boolean rowIsValid(int row) {
-		boolean valid = false;
-		if (row >= 0 && row < levels.size()) {
-			valid = true;
-		}
-		
-		return valid;
+	public static boolean levelIsValid(int index) {
+		return (index >= 0 && index < levels.size());
 	}
 }

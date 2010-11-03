@@ -21,7 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.cassiolandim.crosslasers.LevelTree;
-
+import net.cassiolandim.crosslasers.R;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -39,9 +39,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import net.cassiolandim.crosslasers.R;
-
 public class LevelSelectActivity extends ListActivity {
+	
     private final static int UNLOCK_ALL_LEVELS_ID = 0;
     private final static int UNLOCK_NEXT_LEVEL_ID = 1;
     private final static LevelDataComparator sLevelComparator = new LevelDataComparator();
@@ -52,7 +51,6 @@ public class LevelSelectActivity extends ListActivity {
     private class LevelMetaData {
         public LevelTree.Level level;
         public int x;
-        public int y;
         boolean enabled;
         
         @Override
@@ -72,17 +70,15 @@ public class LevelSelectActivity extends ListActivity {
         private int mCompletedRowResource;
         private Context mContext;
         private int mTextViewResource;
-        private int mTextViewResource2;
         
         public DisableItemArrayAdapter(Context context, int resource, int disabledResource, int completedResource,
-                int textViewResourceId, int textViewResourceId2, List<T> objects) {
+                int textViewResourceId, List<T> objects) {
             super(context, resource, textViewResourceId, objects);
             mRowResource = resource;
             mDisabledRowResource = disabledResource;
             mCompletedRowResource = completedResource;
             mContext = context;
             mTextViewResource = textViewResourceId;
-            mTextViewResource2 = textViewResourceId2;
         }
         
         @Override
@@ -90,7 +86,6 @@ public class LevelSelectActivity extends ListActivity {
             // TODO: do we have separators in this list?
             return mLevelData.get(position).enabled;
         }
-        
         
         @Override
 		public boolean areAllItemsEnabled() {
@@ -153,15 +148,12 @@ public class LevelSelectActivity extends ListActivity {
                         mDisabledRowResource, parent, false);
             	}
             }
+            
             TextView view = (TextView)sourceView.findViewById(mTextViewResource);
             if (view != null) {
                 view.setText(mLevelData.get(position).level.name);
             }
             
-            TextView view2 = (TextView)sourceView.findViewById(mTextViewResource2);
-            if (view2 != null) {
-                view2.setText(mLevelData.get(position).level.timeStamp);
-            }
             return sourceView;
         }
         
@@ -174,11 +166,11 @@ public class LevelSelectActivity extends ListActivity {
         setContentView(R.layout.level_select);
         mLevelData = new ArrayList<LevelMetaData>();
 
-        generateLevelList(true);
+        generateLevelList();
         
         DisableItemArrayAdapter<LevelMetaData> adapter = new DisableItemArrayAdapter<LevelMetaData>(
                 this, R.layout.level_select_row, R.layout.level_select_disabled_row, R.layout.level_select_completed_row,
-                R.id.title, R.id.time, mLevelData);
+                R.id.title, mLevelData);
         
         adapter.sort(sLevelComparator);
         
@@ -192,22 +184,19 @@ public class LevelSelectActivity extends ListActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
     
-    protected void generateLevelList(boolean onlyAllowThePast) {
+    protected void generateLevelList() {
     	final int count = LevelTree.levels.size();
         boolean oneBranchUnlocked = false;
         for (int x = 0; x < count; x++) {
             boolean anyUnlocksThisBranch = false;
-            final LevelTree.LevelGroup group = LevelTree.levels.get(x);
-            for (int y = 0; y < group.levels.size(); y++) {
-                LevelTree.Level level = group.levels.get(y);
-                boolean enabled = false;
-                if (!level.completed && !oneBranchUnlocked) {
-                    enabled = true;
-                    anyUnlocksThisBranch = true;
-                }
-                if (enabled || level.completed || !onlyAllowThePast || (onlyAllowThePast && level.inThePast)) {
-                	addItem(level, x, y, enabled);
-                }
+            final LevelTree.Level level = LevelTree.levels.get(x);
+            boolean enabled = false;
+            if (!level.completed && !oneBranchUnlocked) {
+                enabled = true;
+                anyUnlocksThisBranch = true;
+            }
+            if (enabled || level.completed) {
+            	addItem(level, x, enabled);
             }
             if (anyUnlocksThisBranch) {
                 oneBranchUnlocked = true;
@@ -218,18 +207,13 @@ public class LevelSelectActivity extends ListActivity {
     protected void unlockNext() {
     	final int count = LevelTree.levels.size();
         for (int x = 0; x < count; x++) {
-            final LevelTree.LevelGroup group = LevelTree.levels.get(x);
-            for (int y = 0; y < group.levels.size(); y++) {
-                LevelTree.Level level = group.levels.get(y);
-                if (!level.completed) {
-                	level.completed = true;
-                    return;
-                }
+            final LevelTree.Level level = LevelTree.levels.get(x);
+            if (!level.completed) {
+            	level.completed = true;
+                return;
             }
-           
         }
     }
-    
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -239,10 +223,8 @@ public class LevelSelectActivity extends ListActivity {
 	        if (selectedLevel.enabled) {
 	        	mLevelSelected = true;
 	            Intent intent = new Intent();
-	
-	            intent.putExtra("resource", selectedLevel.level.resource);
-	            intent.putExtra("row", selectedLevel.x);
-	            intent.putExtra("index", selectedLevel.y);
+	            intent.putExtra("index", selectedLevel.x);
+	            
 	            TextView text = (TextView)v.findViewById(R.id.title);
 	            if (text != null) {
 	            	text.startAnimation(mButtonFlickerAnimation);
@@ -255,11 +237,10 @@ public class LevelSelectActivity extends ListActivity {
         }
     }
     
-    private void addItem(LevelTree.Level level, int x, int y, boolean enabled) {
+    private void addItem(LevelTree.Level level, int x, boolean enabled) {
         LevelMetaData data = new LevelMetaData();
         data.level = level;
         data.x = x;
-        data.y = y;
         data.enabled = enabled;
         mLevelData.add(data);
     }
@@ -283,7 +264,7 @@ public class LevelSelectActivity extends ListActivity {
         case UNLOCK_NEXT_LEVEL_ID:
         	unlockNext();
         	mLevelData.clear();
-        	generateLevelList(false);
+        	generateLevelList();
             ((ArrayAdapter)getListAdapter()).sort(sLevelComparator);
             ((ArrayAdapter)getListAdapter()).notifyDataSetChanged();
 
@@ -292,7 +273,7 @@ public class LevelSelectActivity extends ListActivity {
         case UNLOCK_ALL_LEVELS_ID:
         	// Regenerate the level list to remove the past-only filter.
         	mLevelData.clear();
-        	generateLevelList(false);
+        	generateLevelList();
             for (LevelMetaData level : mLevelData) {
                 level.enabled = true;
             }
@@ -324,7 +305,6 @@ public class LevelSelectActivity extends ListActivity {
 		return result;
 	}
 
-
 	/** Comparator for level meta data. */
     private final static class LevelDataComparator implements Comparator<LevelMetaData> {
         public int compare(final LevelMetaData object1, final LevelMetaData object2) {
@@ -334,7 +314,7 @@ public class LevelSelectActivity extends ListActivity {
             } else if (object1 != null && object2 == null) {
                 result = -1;
             } else if (object1 != null && object2 != null) {
-                result = object1.level.timeStamp.compareTo(object2.level.timeStamp);
+                result = object1.level.index.compareTo(object2.level.index);
             }
             return result;
         }
@@ -347,7 +327,6 @@ public class LevelSelectActivity extends ListActivity {
             mIntent = intent;
         }
             
-
         public void onAnimationEnd(Animation animation) {
             setResult(RESULT_OK, mIntent);
             finish();
@@ -355,14 +334,11 @@ public class LevelSelectActivity extends ListActivity {
 
         public void onAnimationRepeat(Animation animation) {
             // TODO Auto-generated method stub
-            
         }
 
         public void onAnimationStart(Animation animation) {
             // TODO Auto-generated method stub
-            
         }
-        
     }
 }
 

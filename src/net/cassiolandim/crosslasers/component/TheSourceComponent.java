@@ -25,6 +25,7 @@ import net.cassiolandim.crosslasers.system.HudSystem;
 
 
 public class TheSourceComponent extends GameComponent {
+	
 	public final static float SHAKE_TIME = 0.6f;
 	private final static float DIE_TIME = 30.0f;
 	private final static float EXPLOSION_TIME = 0.1f;

@@ -36,13 +36,11 @@ import net.cassiolandim.crosslasers.system.RenderSystem.RenderElement;
  * The GameRenderer also invokes texture loads when it is activated.
  */
 public class GameRenderer implements GLSurfaceView.Renderer {
+	
     private static final int PROFILE_REPORT_DELAY = 3 * 1000;
 
     private int mWidth;
     private int mHeight;
-    private int mHalfWidth;
-    private int mHalfHeight;
-    
     private float mScaleX;
     private float mScaleY;
     private Context mContext;
@@ -65,8 +63,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         mGame = game;
         mWidth = gameWidth;
         mHeight = gameHeight;
-        mHalfWidth = gameWidth / 2;
-        mHalfHeight = gameHeight / 2;
         mScaleX = 1.0f;
         mScaleY = 1.0f;
         mDrawQueueChanged = false;
@@ -116,7 +112,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         DebugLog.i("Graphics Support", version + " (" + renderer + "): " +(supportsDrawTexture ?  "draw texture," : "") + (supportsVBOs ? "vbos" : ""));
         
         mGame.onSurfaceCreated();
-
     }
     
     private void hackBrokenDevices() {
@@ -208,8 +203,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
                 final int count = objects.getCount();
                 final float scaleX = mScaleX;
                 final float scaleY = mScaleY;
-                final float halfWidth = mHalfWidth;
-                final float halfHeight = mHalfHeight;
                 mProfileObjectCount += count;
                 for (int i = 0; i < count; i++) {
                     RenderElement element = (RenderElement)objectArray[i];
@@ -270,7 +263,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         mScaleX = scaleX;
         mScaleY = scaleY;
 
-        
         /*
          * Set our projection matrix. This doesn't have to be done each time we
          * draw, but usually a new projection needs to be set when the viewport
@@ -280,7 +272,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glLoadIdentity();
         gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
-        
         
         mGame.onSurfaceReady();
     }
@@ -315,6 +306,4 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     public void setContext(Context newContext) {
         mContext = newContext;
     }
-    
-    
 }

@@ -20,8 +20,8 @@ import javax.microedition.khronos.opengles.GL10;
 
 import net.cassiolandim.crosslasers.system.OpenGLSystem;
 
-
 public class TiledVertexGrid extends BaseObject {
+	
 	private static final float GL_MAGIC_OFFSET = 0.375f;
     private Grid mTileMap;
     private TiledWorld mWorld;

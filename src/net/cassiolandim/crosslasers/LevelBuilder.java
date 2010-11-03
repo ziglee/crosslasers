@@ -22,6 +22,7 @@ import net.cassiolandim.crosslasers.component.RenderComponent;
 import net.cassiolandim.crosslasers.component.ScrollerComponent;
 
 public class LevelBuilder extends BaseObject {
+	
     private final static int THEME_GRASS = 0;
     private final static int THEME_ISLAND = 1;
     private final static int THEME_SEWER = 2;
@@ -29,7 +30,6 @@ public class LevelBuilder extends BaseObject {
     private final static int THEME_LAB = 4;
     private final static int THEME_LIGHTING = 5;
     private final static int THEME_TUTORIAL = 6;
-
     
     private final static int BACKGROUND_SUNSET = 0;
     private final static int BACKGROUND_ISLAND = 1;
@@ -46,7 +46,6 @@ public class LevelBuilder extends BaseObject {
     @Override
     public void reset() {
     }
-    
     
     public GameObject buildBackground(int backgroundImage, int levelWidth, int levelHeight) {
         // Generate the scrolling background.

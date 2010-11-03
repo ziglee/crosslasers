@@ -87,36 +87,9 @@
 <!-- Toast Messages -->
 <string name="memory_playback_start">MEMORY PLAYBACK START</string>
 <string name="memory_playback_complete">MEMORY PLAYBACK COMPLETE</string>
-<string name = "diary_found">FOUND OLD DIARY</string>
-
-<!--  names -->
-<string name = "Wanda">Wanda</string>
-<string name = "Kyle">Kyle</string>
-<string name = "Kabocha">Dr. Kabochanomizu</string>
-<string name = "Rokudou">Mr. Rokudou</string>
-<string name = "Android">Android</string>
 
 <!-- level names -->
-<string name = "level_0_1_sewer">Memory #000</string>
-<string name = "level_0_1_sewer_kyle">Memory #024.3</string>
-<string name = "level_0_1_sewer_wanda">Memory #024.7</string>
-<string name = "level_0_2_lab">Memory #001</string>
-<string name = "level_0_3_lab">Memory #002</string>
-
-<string name = "level_puzzle_test">Puzzle Test</string>
-<string name = "level_object_test">Object Test</string>
-<string name = "level_performance_test">Performance Test</string>
-<string name = "level_performance_test2">Performance Test 2</string>
-<string name = "level_performance_test3">Performance Test 3</string>
-<string name = "level_npc_motion_test">NPC Motion Test</string>
-
-<!-- Level time codes -->
-
-<!-- level names -->
-<string name = "level_0_1_time">+ 07:12:03</string>
-<string name = "level_0_2_time">+ 00:00:00</string>
-<string name = "level_0_3_time">+ 00:06:26</string>
-
-<string name = "level_test_time">(test level)</string>
+<string name = "level_1_1">Level 1-1</string>
+<string name = "level_1_2">Level 1-2</string>
 
 </resources>

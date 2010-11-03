@@ -34,6 +34,7 @@ import net.cassiolandim.crosslasers.component.GameObjectFactory;
  * deactivated.
  */
 public class GameObjectManager extends ObjectManager {
+	
     private static final int MAX_GAME_OBJECTS = 384;
     private final static HorizontalPositionComparator sGameObjectComparator 
         = new HorizontalPositionComparator();
@@ -41,7 +42,6 @@ public class GameObjectManager extends ObjectManager {
     private FixedSizeArray<GameObject> mMarkedForDeathObjects;
     private GameObject mPlayer;
     private boolean mVisitingGraph;
-   
         
     public GameObjectManager(float maxActivationRadius) {
         super(MAX_GAME_OBJECTS);
@@ -98,7 +98,6 @@ public class GameObjectManager extends ObjectManager {
         }
         mVisitingGraph = false;
     }
-    
     
     @Override
     public void add(BaseObject object) {

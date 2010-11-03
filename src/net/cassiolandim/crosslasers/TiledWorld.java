@@ -27,6 +27,7 @@ import android.content.res.AssetManager;
  * deserialization of tilemap files.
  */
 public class TiledWorld extends AllocationGuard {
+	
     private int[][] mTilesArray;
     private int mRowCount;
     private int mColCount;

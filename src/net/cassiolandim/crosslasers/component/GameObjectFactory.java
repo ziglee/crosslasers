@@ -130,7 +130,6 @@ public class GameObjectFactory extends BaseObject {
         EXPLOSION_LARGE(50),
         EXPLOSION_GIANT(51),
         
-        
         // Special Spawnable
         DOOR_RED_NONBLOCKING (52),
         DOOR_BLUE_NONBLOCKING (53),
@@ -146,8 +145,6 @@ public class GameObjectFactory extends BaseObject {
         
         CRUSH_FLASH(61),
         FLASH(62),
-        
-        
         
         // Projectiles
         ENERGY_BALL(68),
@@ -168,17 +165,12 @@ public class GameObjectFactory extends BaseObject {
         GEM_EFFECT(-1),
         GEM_EFFECT_SPAWNER(-1),
         
-        
         // End
         OBJECT_COUNT(-1);
         
         private final int mIndex;
         GameObjectType(int index) {
             this.mIndex = index;
-        }
-        
-        public int index() {
-            return mIndex;
         }
         
         // TODO: Is there any better way to do this?
@@ -194,7 +186,6 @@ public class GameObjectFactory extends BaseObject {
             }
             return foundType;
         }
-        
     }
     
     public GameObjectFactory() {
@@ -577,9 +568,10 @@ public class GameObjectFactory extends BaseObject {
     
 	
 
-	public void spawnFromWorld(TiledWorld world, int tileWidth, int tileHeight) {
+	public void spawnFromWorld(TiledWorld world) {
         // Walk the world and spawn objects based on tile indexes.
         final float worldHeight = world.getHeight() * tileHeight;
+        
         GameObjectManager manager = sSystemRegistry.gameObjectManager;
         if (manager != null) {
             for (int y = 0; y < world.getHeight(); y++) {
@@ -593,16 +585,18 @@ public class GameObjectFactory extends BaseObject {
                             GameObject object = spawn(type, worldX, worldY, false);
                             if (object != null) {
                                 if (object.height < tileHeight) {
-                                    // make sure small objects are vertically centered in their
-                                    // tile.
-                                    object.getPosition().y += (tileHeight - object.height) / 2.0f;
+                                    // make sure small objects are vertically centered in their tile.
+                                    object.getPosition().y += (tileHeight - object.height) / 2f;
                                 }
+                                
                                 if (object.width < tileWidth) {
-                                    object.getPosition().x += (tileWidth - object.width) / 2.0f;
+                                    object.getPosition().x += (tileWidth - object.width) / 2f;
                                 } else if (object.width > tileWidth) {
-                                    object.getPosition().x -= (object.width - tileWidth) / 2.0f;
+                                    object.getPosition().x -= (object.width - tileWidth) / 2f;
                                 }
+                                
                                 manager.add(object);
+                                
                                 if (type == GameObjectType.PLAYER) {
                                     manager.setPlayer(object);
                                 }

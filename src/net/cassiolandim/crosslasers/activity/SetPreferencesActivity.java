@@ -57,7 +57,6 @@ public class SetPreferencesActivity extends PreferenceActivity implements
 		if (positiveResult) {
 			SharedPreferences prefs = getSharedPreferences(AndouKun.PREFERENCE_NAME, MODE_PRIVATE);
 			SharedPreferences.Editor editor = prefs.edit();
-			editor.remove(AndouKun.PREFERENCE_LEVEL_ROW);
 			editor.remove(AndouKun.PREFERENCE_LEVEL_INDEX);
 			editor.remove(AndouKun.PREFERENCE_LEVEL_COMPLETED);
 			editor.commit();

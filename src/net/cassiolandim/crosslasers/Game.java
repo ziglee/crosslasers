@@ -52,7 +52,6 @@ public class Game extends AllocationGuard {
     private boolean mBootstrapComplete;
     private LevelTree.Level mPendingLevel;
     private LevelTree.Level mCurrentLevel;
-    private LevelTree.Level mLastLevel;
     private boolean mGLDataLoaded;
     private ContextParameters mContextParameters;
     
@@ -144,7 +143,6 @@ public class Game extends AllocationGuard {
             gameRoot.add(dynamicCollision);
             BaseObject.sSystemRegistry.gameObjectCollisionSystem = dynamicCollision;
             
-            
             RenderSystem renderer = new RenderSystem();
             BaseObject.sSystemRegistry.renderSystem = renderer;
             BaseObject.sSystemRegistry.vectorPool = new VectorPool();
@@ -231,7 +229,6 @@ public class Game extends AllocationGuard {
         }
     }
     
-    
     protected synchronized void stopLevel() {
         stop();
         GameObjectManager manager = BaseObject.sSystemRegistry.gameObjectManager;
@@ -292,10 +289,8 @@ public class Game extends AllocationGuard {
     }
     
     protected synchronized void goToLevel(LevelTree.Level level) {
-        
         ContextParameters params = BaseObject.sSystemRegistry.contextParameters;
-        BaseObject.sSystemRegistry.levelSystem.loadLevel(level,
-                params.context.getResources().openRawResource(level.resource), mGameRoot);
+        BaseObject.sSystemRegistry.levelSystem.loadLevel(level, mGameRoot);
         
         Context context = params.context;
         mRenderer.setContext(context);
@@ -318,16 +313,8 @@ public class Game extends AllocationGuard {
         
         CustomToastSystem toast = BaseObject.sSystemRegistry.customToastSystem;
         if (toast != null) {
-        	if (level.inThePast) {
-        		toast.toast(context.getString(R.string.memory_playback_start), Toast.LENGTH_LONG);
-        	} else {
-        		if (mLastLevel != null && mLastLevel.inThePast) {
-            		toast.toast(context.getString(R.string.memory_playback_complete), Toast.LENGTH_LONG);
-        		}
-        	}
+    		toast.toast(context.getString(R.string.memory_playback_start), Toast.LENGTH_LONG);
         }
-        
-        mLastLevel = level;
         
         start();
     }

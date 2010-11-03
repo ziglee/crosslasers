@@ -57,7 +57,6 @@ public class AndouKun extends Activity implements SensorEventListener {
     
     private static final int ROLL_TO_FACE_BUTTON_DELAY = 400;
     
-    public static final String PREFERENCE_LEVEL_ROW = "levelRow";
     public static final String PREFERENCE_LEVEL_INDEX = "levelIndex";
     public static final String PREFERENCE_LEVEL_COMPLETED = "levelsCompleted";
     public static final String PREFERENCE_SOUND_ENABLED = "enableSound";
@@ -87,7 +86,6 @@ public class AndouKun extends Activity implements SensorEventListener {
     private GLSurfaceView mGLSurfaceView;
     private Game mGame;
     private boolean mMethodTracing;
-    private int mLevelRow;
     private int mLevelIndex;
     private SensorManager mSensorManager;
     private SharedPreferences.Editor mPrefsEditor;
@@ -138,12 +136,10 @@ public class AndouKun extends Activity implements SensorEventListener {
         mGame.bootstrap(this, dm.widthPixels, dm.heightPixels, defaultWidth, defaultHeight);
         mGLSurfaceView.setRenderer(mGame.getRenderer());
         
-        mLevelRow = 0;
         mLevelIndex = 0;
         
         
         mPrefsEditor = prefs.edit();
-        mLevelRow = prefs.getInt(PREFERENCE_LEVEL_ROW, 0);
         mLevelIndex = prefs.getInt(PREFERENCE_LEVEL_INDEX, 0);
         int completed = prefs.getInt(PREFERENCE_LEVEL_COMPLETED, 0);
         
@@ -152,45 +148,34 @@ public class AndouKun extends Activity implements SensorEventListener {
         // case we need to make sure that this static data is valid.
         if (!LevelTree.isLoaded()) {
         	LevelTree.loadLevelTree(R.xml.level_tree, this);
-        	LevelTree.loadAllDialog(this);
         }
         
-        if (!LevelTree.levelIsValid(mLevelRow, mLevelIndex)) {
+        if (!LevelTree.levelIsValid(mLevelIndex)) {
         	// bad data?  Let's try to recover.
         	
-        	// is the row valid?
-        	if (LevelTree.rowIsValid(mLevelRow)) {
-        		// In that case, just start the row over.
-        		mLevelIndex = 0;
-        		completed = 0;
-        	} else if (LevelTree.rowIsValid(mLevelRow - 1)) {
-        		// If not, try to back up a row.
-        		mLevelRow--;
-        		mLevelIndex = 0;
-        		completed = 0;
+        	if (LevelTree.levelIsValid(mLevelIndex - 1)) {
+	    		// If not, try to back up a row.
+	    		mLevelIndex--;
+	    		completed = 0;
         	}
-        	
-        	
-        	if (!LevelTree.levelIsValid(mLevelRow, mLevelIndex)) {
-	        	// if all else fails, start the game over.
-	        	mLevelRow = 0;
-	        	mLevelIndex = 0;
-	        	completed = 0;
-        	}
-        } 
+        }
+    	
+    	if (!LevelTree.levelIsValid(mLevelIndex)) {
+        	// if all else fails, start the game over.
+        	mLevelIndex = 0;
+        	completed = 0;
+    	}
         
-        LevelTree.updateCompletedState(mLevelRow, completed);
+        LevelTree.updateCompletedState(mLevelIndex, completed);
         
-        mGame.setPendingLevel(LevelTree.get(mLevelRow, mLevelIndex));
+        mGame.setPendingLevel(LevelTree.get(mLevelIndex));
         
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         // This activity uses the media stream.
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         
-          
         mSessionId = prefs.getLong(PREFERENCE_SESSION_ID, System.currentTimeMillis());
-        
         
         mEventReporter = null;
         mEventReporterThread = null;
@@ -219,7 +204,6 @@ public class AndouKun extends Activity implements SensorEventListener {
         super.onDestroy();
         
     }
-
 
     @Override
     protected void onPause() {
@@ -259,7 +243,6 @@ public class AndouKun extends Activity implements SensorEventListener {
         mGLSurfaceView.onResume();
         mGame.onResume(this, false);
        
-        
         final boolean soundEnabled = prefs.getBoolean(PREFERENCE_SOUND_ENABLED, true);
         final boolean safeMode = prefs.getBoolean(PREFERENCE_SAFE_MODE, false);
         final boolean clickAttack = prefs.getBoolean(PREFERENCE_CLICK_ATTACK, true);
@@ -416,11 +399,10 @@ public class AndouKun extends Activity implements SensorEventListener {
         
         if (requestCode == ACTIVITY_CHANGE_LEVELS) {
 	        if (resultCode == RESULT_OK) {
-	            mLevelRow = intent.getExtras().getInt("row");
 	            mLevelIndex = intent.getExtras().getInt("index");
 	            saveGame();
 	            
-	            mGame.setPendingLevel(LevelTree.get(mLevelRow, mLevelIndex));    
+	            mGame.setPendingLevel(LevelTree.get(mLevelIndex));    
 	        }  
         }
     }
@@ -437,62 +419,45 @@ public class AndouKun extends Activity implements SensorEventListener {
                finish();
                break;
            case GameFlowEvent.EVENT_RESTART_LEVEL:
-        	   if (LevelTree.get(mLevelRow, mLevelIndex).restartable) {
-        		   if (mEventReporter != null) {
-	        		   mEventReporter.addEvent(EventReporter.EVENT_DEATH,
-	        				   mGame.getLastDeathPosition().x, 
-	        				   mGame.getLastDeathPosition().y, 
-	        				   mGame.getGameTime(), 
-	        				   LevelTree.get(mLevelRow, mLevelIndex).name, 
-	        				   VERSION, 
-	        				   mSessionId);
-        		   }
-        		   mGame.restartLevel();
-        		   break;
-        	   }
-        	   // else, fall through and go to the next level.
+    		   if (mEventReporter != null) {
+        		   mEventReporter.addEvent(EventReporter.EVENT_DEATH,
+        				   mGame.getLastDeathPosition().x, 
+        				   mGame.getLastDeathPosition().y, 
+        				   mGame.getGameTime(), 
+        				   LevelTree.get(mLevelIndex).name, 
+        				   VERSION, 
+        				   mSessionId);
+    		   }
+    		   mGame.restartLevel();
+    		   break;
+
+    		   // else, fall through and go to the next level.
            case GameFlowEvent.EVENT_GO_TO_NEXT_LEVEL:
-               LevelTree.get(mLevelRow, mLevelIndex).completed = true;
-               final LevelTree.LevelGroup currentGroup = LevelTree.levels.get(mLevelRow);
-               final int count = currentGroup.levels.size();
-               boolean groupCompleted = true;
+               LevelTree.get(mLevelIndex).completed = true;
+               final LevelTree.Level currentLevel = LevelTree.levels.get(mLevelIndex);
+               final int count = LevelTree.levels.size();
+               boolean levelCompleted = true;
+               
                if (mEventReporter != null) {
 	               mEventReporter.addEvent(EventReporter.EVENT_BEAT_LEVEL,
 	    				   0, 
 	    				   0, 
 	    				   mGame.getGameTime(), 
-	    				   LevelTree.get(mLevelRow, mLevelIndex).name, 
+	    				   LevelTree.get(mLevelIndex).name, 
 	    				   VERSION, 
 	    				   mSessionId);
                }
-               for (int x = 0; x < count; x++) {
-            	   if (currentGroup.levels.get(x).completed == false) {
-            		   // We haven't completed the group yet.
-            		   mLevelIndex = x;
-            		   groupCompleted = false;
-            		   break;
-            	   }
+               
+               
+               if (levelCompleted) {
+                   mLevelIndex++;
                }
                
-               if (groupCompleted) {
-                   mLevelIndex = 0;
-                   mLevelRow++;
-               }
-               
-               
-               if (mLevelRow < LevelTree.levels.size()) {
-            	   final LevelTree.Level currentLevel = LevelTree.get(mLevelRow, mLevelIndex);
-            	   if (currentLevel.inThePast || LevelTree.levels.get(mLevelRow).levels.size() > 1) {
-            		   // go to the level select.
-            		   Intent i = new Intent(this, LevelSelectActivity.class);
-                       startActivityForResult(i, ACTIVITY_CHANGE_LEVELS);
-            	   } else {
-            		   // go directly to the next level
-	                   mGame.setPendingLevel(currentLevel);
-	                   mGame.requestNewLevel();
-            	   }
+               if (mLevelIndex < LevelTree.levels.size()) {
+        		   // go directly to the next level
+                   mGame.setPendingLevel(currentLevel);
+                   mGame.requestNewLevel();
             	   saveGame();
-            	   
                } else {
             	   if (mEventReporter != null) {
 	            	   mEventReporter.addEvent(EventReporter.EVENT_BEAT_GAME,
@@ -504,38 +469,18 @@ public class AndouKun extends Activity implements SensorEventListener {
 	        				   mSessionId);
             	   }
                    // We beat the game!
-            	   mLevelRow = 0;
             	   mLevelIndex = 0;
             	   saveGame();
                    mGame.stop();
                    finish();
                }
                break;
-               
-           case GameFlowEvent.EVENT_SHOW_DIALOG_CHARACTER1:
-        	   Intent i = new Intent(this, ConversationDialogActivity.class);
-               i.putExtra("levelRow", mLevelRow);
-               i.putExtra("levelIndex", mLevelIndex);
-               i.putExtra("index", index);
-               i.putExtra("character", 1);
-               startActivity(i);
-               break;
-               
-           case GameFlowEvent.EVENT_SHOW_DIALOG_CHARACTER2:
-        	   i = new Intent(this, ConversationDialogActivity.class);
-               i.putExtra("levelRow", mLevelRow);
-               i.putExtra("levelIndex", mLevelIndex);
-               i.putExtra("index", index);
-               i.putExtra("character", 2);
-               startActivity(i);
-               break;
        }
     }
     
     protected void saveGame() {
     	if (mPrefsEditor != null) {
-    		final int completed = LevelTree.packCompletedLevels(mLevelRow);
-    		mPrefsEditor.putInt(PREFERENCE_LEVEL_ROW, mLevelRow);
+    		final int completed = LevelTree.packCompletedLevels(mLevelIndex);
     		mPrefsEditor.putInt(PREFERENCE_LEVEL_INDEX, mLevelIndex);
     		mPrefsEditor.putInt(PREFERENCE_LEVEL_COMPLETED, completed);
     		mPrefsEditor.putLong(PREFERENCE_SESSION_ID, mSessionId);
