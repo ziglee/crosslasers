@@ -19,18 +19,10 @@ package net.cassiolandim.crosslasers;
 
 import net.cassiolandim.crosslasers.component.GameComponent;
 import net.cassiolandim.crosslasers.component.RenderComponent;
-import net.cassiolandim.crosslasers.component.ScrollerComponent;
+import net.cassiolandim.crosslasers.component.BackgroundComponent;
 
 public class LevelBuilder extends BaseObject {
 	
-    private final static int THEME_GRASS = 0;
-    private final static int THEME_ISLAND = 1;
-    private final static int THEME_SEWER = 2;
-    private final static int THEME_UNDERGROUND = 3;
-    private final static int THEME_LAB = 4;
-    private final static int THEME_LIGHTING = 5;
-    private final static int THEME_TUTORIAL = 6;
-    
     private final static int BACKGROUND_SUNSET = 0;
     private final static int BACKGROUND_ISLAND = 1;
     private final static int BACKGROUND_SEWER = 2;
@@ -47,7 +39,7 @@ public class LevelBuilder extends BaseObject {
     public void reset() {
     }
     
-    public GameObject buildBackground(int backgroundImage, int levelWidth, int levelHeight) {
+    public GameObject buildBackground(int backgroundImage) {
         // Generate the scrolling background.
         TextureLibrary textureLibrary = sSystemRegistry.shortTermTextureLibrary;
         
@@ -96,8 +88,8 @@ public class LevelBuilder extends BaseObject {
                 int width = idealSize;
                 int height = idealSize;
                 
-                ScrollerComponent scroller3 = 
-                        new ScrollerComponent(0.0f, 0.0f, width, height, 
+                BackgroundComponent scroller3 = 
+                        new BackgroundComponent(0.0f, 0.0f, width, height, 
                             textureLibrary.allocateTexture(backgroundResource));
                 scroller3.setRenderComponent(backgroundRender);
                 
@@ -106,67 +98,6 @@ public class LevelBuilder extends BaseObject {
             }
         }
         return background;
-    }
-    
-    public void addTileMapLayer(GameObject background, int priority, float scrollSpeed, 
-            int width, int height, int tileWidth, int tileHeight, TiledWorld world, 
-            int theme) {
-        
-        int tileMapIndex = 0;
-        switch(theme) {
-            case THEME_GRASS:
-                tileMapIndex = R.drawable.grass;
-                break;
-            case THEME_ISLAND:
-                tileMapIndex = R.drawable.island;
-                break;
-            case THEME_SEWER:
-                tileMapIndex = R.drawable.sewage;
-                break;
-            case THEME_UNDERGROUND:
-                tileMapIndex = R.drawable.cave;
-                break;
-            case THEME_LAB:
-                tileMapIndex = R.drawable.lab;
-                break;
-            case THEME_LIGHTING:
-                tileMapIndex = R.drawable.titletileset;
-                priority = SortConstants.OVERLAY; //hack!
-                break;
-            case THEME_TUTORIAL:
-                tileMapIndex = R.drawable.tutorial;
-                break;
-            default:
-                assert false;
-        }
-        
-        RenderComponent backgroundRender = new RenderComponent();
-        backgroundRender.setPriority(priority);
-        
-        //Vertex Buffer Code
-        TextureLibrary textureLibrary = sSystemRegistry.shortTermTextureLibrary;
-        TiledVertexGrid bg = new TiledVertexGrid(textureLibrary.allocateTexture(tileMapIndex), 
-                width, height, tileWidth, tileHeight);
-        bg.setWorld(world);
-        
-        //TODO: The map format should really just output independent speeds for x and y,
-        // but as a short term solution we can assume parallax layers lock in the smaller
-        // direction of movement.
-        float xScrollSpeed = 1.0f;
-        float yScrollSpeed = 1.0f;
-        
-        if (world.getWidth() > world.getHeight()) {
-        	xScrollSpeed = scrollSpeed;
-        } else {
-        	yScrollSpeed = scrollSpeed;
-        }
-        
-        ScrollerComponent scroller = new ScrollerComponent(xScrollSpeed, yScrollSpeed,
-                width, height, bg);
-        scroller.setRenderComponent(backgroundRender);
-
-        background.add(scroller);
-        background.add(backgroundRender);
     }
 
     // This method is a HACK to workaround the stupid map file format.

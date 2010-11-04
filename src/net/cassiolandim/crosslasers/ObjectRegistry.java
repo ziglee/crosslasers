@@ -23,7 +23,6 @@ import net.cassiolandim.crosslasers.system.ChannelSystem;
 import net.cassiolandim.crosslasers.system.CollisionSystem;
 import net.cassiolandim.crosslasers.system.CustomToastSystem;
 import net.cassiolandim.crosslasers.system.DebugSystem;
-import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.HudSystem;
 import net.cassiolandim.crosslasers.system.InputSystem;
 import net.cassiolandim.crosslasers.system.LevelSystem;
@@ -58,7 +57,6 @@ public class ObjectRegistry extends BaseObject {
     public GameObjectFactory gameObjectFactory;
     public GameObjectManager gameObjectManager;
     public HitPointPool hitPointPool;
-    public HotSpotSystem hotSpotSystem;
     public HudSystem hudSystem;
 	public InputGameInterface inputGameInterface;
     public InputSystem inputSystem;

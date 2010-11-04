@@ -21,13 +21,11 @@ import net.cassiolandim.crosslasers.activity.AndouKun;
 import android.content.Context;
 
 public class GameFlowEvent implements Runnable {
+
 	public static final int EVENT_INVALID = -1;
     public static final int EVENT_RESTART_LEVEL = 0;
     public static final int EVENT_END_GAME = 1;
     public static final int EVENT_GO_TO_NEXT_LEVEL = 2;
-    
-    public static final int EVENT_SHOW_DIALOG_CHARACTER1 = 4;
-    public static final int EVENT_SHOW_DIALOG_CHARACTER2 = 5;
 	public static final int EVENT_SHOW_ANIMATION = 6;
 
     private int mEventCode;

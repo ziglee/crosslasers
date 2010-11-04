@@ -16,23 +16,15 @@
 
 package net.cassiolandim.crosslasers.system;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import net.cassiolandim.crosslasers.BaseObject;
-import net.cassiolandim.crosslasers.ContextParameters;
 import net.cassiolandim.crosslasers.DebugLog;
 import net.cassiolandim.crosslasers.GameFlowEvent;
 import net.cassiolandim.crosslasers.GameObject;
 import net.cassiolandim.crosslasers.LevelBuilder;
 import net.cassiolandim.crosslasers.LevelTree;
 import net.cassiolandim.crosslasers.ObjectManager;
-import net.cassiolandim.crosslasers.SortConstants;
 import net.cassiolandim.crosslasers.TiledWorld;
-import net.cassiolandim.crosslasers.Utils;
 import net.cassiolandim.crosslasers.component.GameObjectFactory;
-
-import android.content.res.AssetManager;
 
 /**
  * Manages information about the current level, including setup,
@@ -106,50 +98,15 @@ public class LevelSystem extends BaseObject {
 		mCurrentLevel = level;
 		mRoot = root;
 
-		ContextParameters params = sSystemRegistry.contextParameters;
+		LevelBuilder builder = sSystemRegistry.levelBuilder;
 
-		int currentPriority = SortConstants.BACKGROUND_START + 1;
-
-		// TODO: use a pool here? Seems pointless.
-		TiledWorld world = new TiledWorld(byteStream);
-
-		if (type == 0) { // it's a background layer
-			// We require a collision layer to set up the tile sizes before
-			// we load.
-			// TODO: this really sucks. there's no reason each layer can't
-			// have its
-			// own tile widths and heights. Refactor this crap.
-			if (mWidthInTiles > 0 && mTileWidth > 0) {
-
-				LevelBuilder builder = sSystemRegistry.levelBuilder;
-
-				if (mBackgroundObject == null) {
-					mBackgroundObject = builder
-							.buildBackground(backgroundIndex);
-					root.add(mBackgroundObject);
-				}
-
-				builder.addTileMapLayer(mBackgroundObject, currentPriority,
-						params.gameWidth, params.gameHeight, world);
-
-				currentPriority++;
-			}
-
-		} else if (type == 1) { // collision
-			// Collision always defines the world boundaries.
-			CollisionSystem collision = sSystemRegistry.collisionSystem;
-			if (collision != null) {
-				collision.initialize(world);
-			}
-		} else if (type == 2) { // objects
-			mSpawnLocations = world;
-			spawnObjects();
-		} else if (type == 3) { // hot spots
-			HotSpotSystem hotSpots = sSystemRegistry.hotSpotSystem;
-			if (hotSpots != null) {
-				hotSpots.setWorld(world);
-			}
+		if (mBackgroundObject == null) {
+			mBackgroundObject = builder.buildBackground(0);
+			root.add(mBackgroundObject);
 		}
+
+		mSpawnLocations = new TiledWorld(level);
+		spawnObjects();
 
 		// hack!
 		sSystemRegistry.levelBuilder.promoteForegroundLayer(mBackgroundObject);

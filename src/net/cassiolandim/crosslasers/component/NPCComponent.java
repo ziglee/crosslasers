@@ -22,23 +22,16 @@ import net.cassiolandim.crosslasers.GameObject;
 import net.cassiolandim.crosslasers.GameObjectManager;
 import net.cassiolandim.crosslasers.Utils;
 import net.cassiolandim.crosslasers.Vector2;
-import net.cassiolandim.crosslasers.CollisionParameters.HitType;
 import net.cassiolandim.crosslasers.GameObject.ActionType;
-import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.HudSystem;
 import net.cassiolandim.crosslasers.system.LevelSystem;
 
-
 public class NPCComponent extends GameComponent {
+	
     private float mPauseTime;
     private float mTargetXVelocity;
     private int mLastHitTileX;
     private int mLastHitTileY;
-    
-    private int mDialogEvent;
-    private int mDialogIndex;
-    
-    private HitReactionComponent mHitReactComponent;
     
     private int[] mQueuedCommands;
     private int mQueueTop;
@@ -96,9 +89,6 @@ public class NPCComponent extends GameComponent {
         mTargetXVelocity = 0.0f;
         mLastHitTileX = 0;
         mLastHitTileY = 0;
-        mDialogEvent = GameFlowEvent.EVENT_SHOW_DIALOG_CHARACTER1;
-        mDialogIndex = 0;
-        mHitReactComponent = null;
         mQueueTop = 0;
         mQueueBottom = 0;
         mPreviousPosition.zero();
@@ -253,33 +243,6 @@ public class NPCComponent extends GameComponent {
 
             break;
             
-        case HotSpotSystem.HotSpotType.TALK:
-        	if (mHitReactComponent != null) {
-            	if (parentObject.lastReceivedHitType != HitType.COLLECT) {
-            		mHitReactComponent.setSpawnGameEventOnHit(
-            				HitType.COLLECT, mDialogEvent, mDialogIndex);
-            		if (parentObject.getVelocity().x != 0.0f) {
-            			pauseMovement(parentObject);
-            		}
-            		hitAccepted = false;
-            	} else {
-                    parentObject.setCurrentAction(ActionType.MOVE);
-
-            		resumeMovement(parentObject);	                        		
-            		mHitReactComponent.setSpawnGameEventOnHit(HitType.INVALID, 0, 0);
-            		parentObject.lastReceivedHitType = HitType.INVALID;
-            	}
-        	}
-        	break;
-        
-        case HotSpotSystem.HotSpotType.WALK_AND_TALK:
-        	if (mDialogEvent != GameFlowEvent.EVENT_INVALID) {
-        		LevelSystem level = sSystemRegistry.levelSystem;
-        		level.sendGameEvent(mDialogEvent, mDialogIndex, true);
-        		mDialogEvent = GameFlowEvent.EVENT_INVALID;
-        	}
-        	break;
-        	
         case HotSpotSystem.HotSpotType.END_LEVEL:
         	HudSystem hud = sSystemRegistry.hudSystem;
         	
@@ -402,18 +365,6 @@ public class NPCComponent extends GameComponent {
         	parentObject.getTargetVelocity().x = mSlowHorizontalImpulse * Utils.sign(parentObject.getTargetVelocity().x);
             break;
             
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_1_1:
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_1_2:
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_1_3:
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_1_4:
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_1_5:
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_2_1:
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_2_2:
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_2_3:
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_2_4:
-        case HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_2_5:
-        	selectDialog(hotSpot);
-        	break;
         case HotSpotSystem.HotSpotType.NONE:
             if (parentObject.touchingGround() && parentObject.getVelocity().y <= 0.0f) {
                 //resumeMovement(parentObject);
@@ -433,16 +384,6 @@ public class NPCComponent extends GameComponent {
     private void resumeMovement(GameObject parentObject) {
     	parentObject.getTargetVelocity().x = mTargetXVelocity;
     	parentObject.getAcceleration().x = mAcceleration;
-    }
-    
-    private void selectDialog(int hitSpot) {
-		mDialogEvent = GameFlowEvent.EVENT_SHOW_DIALOG_CHARACTER1;
-    	mDialogIndex = hitSpot - HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_1_1;
-    	
-    	if (hitSpot >= HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_2_1) {
-    		mDialogEvent = GameFlowEvent.EVENT_SHOW_DIALOG_CHARACTER2;
-    		mDialogIndex = hitSpot - HotSpotSystem.HotSpotType.NPC_SELECT_DIALOG_2_1;
-    	}
     }
     
     private int nextCommand() {
@@ -468,10 +409,6 @@ public class NPCComponent extends GameComponent {
     		mQueuedCommands[mQueueBottom] = hotspot;
     		mQueueBottom = nextSlot;
     	}
-    }
-    
-    public void setHitReactionComponent(HitReactionComponent hitReact) {
-    	mHitReactComponent = hitReact;
     }
     
     public void setSpeeds(float horizontalImpulse, float slowHorizontalImpulse, float upImpulse, float downImpulse, float acceleration) {

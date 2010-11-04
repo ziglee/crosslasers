@@ -26,7 +26,6 @@ import net.cassiolandim.crosslasers.InputXY;
 import net.cassiolandim.crosslasers.Utils;
 import net.cassiolandim.crosslasers.CollisionParameters.HitType;
 import net.cassiolandim.crosslasers.GameObject.ActionType;
-import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem;
 import net.cassiolandim.crosslasers.system.TimeSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem.Sound;
@@ -295,17 +294,7 @@ public class AnimationComponent extends GameComponent {
                 		sound.play(mExplosionSound, false, SoundSystem.PRIORITY_NORMAL);
                 	}
                 	// by default, explode when hit with the DEATH hit type.
-                    boolean explodingDeath = parentObject.lastReceivedHitType == HitType.DEATH;
-                    // or if touching a death tile.
-                    HotSpotSystem hotSpot = sSystemRegistry.hotSpotSystem;
-                    if (hotSpot != null) {
-                        // TODO: HACK!  Unify all this code.
-                        if (hotSpot.getHotSpot(parentObject.getCenteredPositionX(), 
-                                parentObject.getPosition().y + 10.0f) == HotSpotSystem.HotSpotType.DIE) {
-                            explodingDeath = true;
-                        }
-                    }
-                    if (explodingDeath) {
+                    if (parentObject.lastReceivedHitType == HitType.DEATH) {
                         mExplodingDeath = true;
                         GameObjectFactory factory = sSystemRegistry.gameObjectFactory;
                         GameObjectManager manager = sSystemRegistry.gameObjectManager;

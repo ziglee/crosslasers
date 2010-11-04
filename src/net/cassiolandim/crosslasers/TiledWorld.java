@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.cassiolandim.crosslasers;
 
 import java.io.IOException;
@@ -31,29 +30,10 @@ public class TiledWorld extends AllocationGuard {
     private int[][] mTilesArray;
     private int mRowCount;
     private int mColCount;
-    private byte[] mWorkspaceBytes;
-    
-    public TiledWorld(int cols, int rows) {
-        super();
-        mTilesArray = new int[cols][rows];
-        mRowCount = rows;
-        mColCount = cols;
 
-        for (int x = 0; x < cols; x++) {
-            for (int y = 0; y < rows; y++) {
-                mTilesArray[x][y] = -1;
-            }
-        }
-        
-        mWorkspaceBytes = new byte[4];
-        
-        calculateSkips();
-    }
-
-    public TiledWorld(InputStream stream) {
+    public TiledWorld(LevelTree.Level level) {
         super();
-        mWorkspaceBytes = new byte[4];
-        parseInput(stream);
+        parseInput(level);
         calculateSkips();
     }
 
@@ -71,7 +51,7 @@ public class TiledWorld extends AllocationGuard {
     // Third byte: height of the world in tiles.
     // Subsequent bytes: actual tile data in column-major order.
     // TODO: add a checksum in here somewhere.
-    protected boolean parseInput(InputStream stream) {
+    protected boolean parseInput(LevelTree.Level level) {
         boolean success = false;
         AssetManager.AssetInputStream byteStream = (AssetManager.AssetInputStream) stream;
         int signature;

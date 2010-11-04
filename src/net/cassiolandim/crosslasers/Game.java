@@ -21,7 +21,6 @@ import net.cassiolandim.crosslasers.component.GameObjectFactory;
 import net.cassiolandim.crosslasers.system.ChannelSystem;
 import net.cassiolandim.crosslasers.system.CollisionSystem;
 import net.cassiolandim.crosslasers.system.CustomToastSystem;
-import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.HudSystem;
 import net.cassiolandim.crosslasers.system.InputSystem;
 import net.cassiolandim.crosslasers.system.LevelSystem;
@@ -125,8 +124,6 @@ public class Game extends AllocationGuard {
             
             GameObjectFactory objectFactory = new GameObjectFactory();
             BaseObject.sSystemRegistry.gameObjectFactory = objectFactory;
-            
-            BaseObject.sSystemRegistry.hotSpotSystem = new HotSpotSystem();
             
             BaseObject.sSystemRegistry.levelBuilder = new LevelBuilder();
             

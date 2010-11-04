@@ -254,7 +254,7 @@ public class GameObjectFactory extends BaseObject {
                 new ComponentClass(PlaySingleSoundComponent.class, 32),
                 new ComponentClass(PopOutComponent.class, 32),
                 new ComponentClass(RenderComponent.class, 384),
-                new ComponentClass(ScrollerComponent.class, 8),
+                new ComponentClass(BackgroundComponent.class, 8),
                 new ComponentClass(SelectDialogComponent.class, 8),
                 new ComponentClass(SimpleCollisionComponent.class, 32),
                 new ComponentClass(SimplePhysicsComponent.class, 256),

@@ -30,7 +30,6 @@ import net.cassiolandim.crosslasers.Vector2;
 import net.cassiolandim.crosslasers.VectorPool;
 import net.cassiolandim.crosslasers.CollisionParameters.HitType;
 import net.cassiolandim.crosslasers.GameObject.ActionType;
-import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.HudSystem;
 import net.cassiolandim.crosslasers.system.TimeSystem;
 import net.cassiolandim.crosslasers.system.VibrationSystem;
@@ -55,7 +54,6 @@ public class PlayerComponent extends GameComponent {
     private static final float STOMP_VELOCITY = -1000.0f;
     private static final float STOMP_DELAY_TIME = 0.15f;
     private static final float STOMP_AIR_HANG_TIME = 0.0f; //0.25f;
-    private static final float STOMP_SHAKE_MAGNITUDE = 15.0f;
     private static final float STOMP_VIBRATE_TIME = 0.05f;
     private static final float HIT_REACT_TIME = 0.5f;
 
@@ -285,16 +283,6 @@ public class PlayerComponent extends GameComponent {
             		&& parentObject.lastReceivedHitType != HitType.INVALID
                     && parentObject.getCurrentAction() == ActionType.HIT_REACT) {
                 gotoHitReact(parentObject, gameTime);
-            } else {
-                HotSpotSystem hotSpot = sSystemRegistry.hotSpotSystem;
-                if (hotSpot != null) {
-                    // TODO: HACK!  Unify all this code.
-                    if (hotSpot.getHotSpot(parentObject.getCenteredPositionX(), 
-                            parentObject.getPosition().y + 10.0f) == HotSpotSystem.HotSpotType.DIE) {
-                        parentObject.life = 0;
-                        gotoDead(gameTime);
-                    }
-                }
             }
         }
         

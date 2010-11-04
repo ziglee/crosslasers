@@ -21,7 +21,6 @@ import net.cassiolandim.crosslasers.ContextParameters;
 import net.cassiolandim.crosslasers.GameObject;
 import net.cassiolandim.crosslasers.GameObjectManager;
 import net.cassiolandim.crosslasers.Vector2;
-import net.cassiolandim.crosslasers.system.HotSpotSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem;
 import net.cassiolandim.crosslasers.system.SoundSystem.Sound;
 
@@ -94,23 +93,6 @@ public class LifetimeComponent extends GameComponent {
                 die(parentObject);
                 return;
             }
-        }
-        
-        if (parentObject.life > 0 && mVulnerableToDeathTiles) {
-            HotSpotSystem hotSpot = sSystemRegistry.hotSpotSystem;
-            if (hotSpot != null) {
-                // TODO: HACK!  Unify all this code.
-                if (hotSpot.getHotSpot(parentObject.getCenteredPositionX(), 
-                        parentObject.getPosition().y + 10.0f) == HotSpotSystem.HotSpotType.DIE) {
-                    parentObject.life = 0;
-                }
-            }
-        }
-        
-        if (parentObject.life > 0 && mDieOnHitBackground) {
-        	if (parentObject.getBackgroundCollisionNormal().length2() > 0.0f) {
-        		parentObject.life = 0;
-        	}
         }
         
         if (parentObject.life <= 0) {
