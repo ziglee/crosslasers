@@ -17,14 +17,11 @@
 package net.cassiolandim.crosslasers.component;
 
 import net.cassiolandim.crosslasers.BaseObject;
-import net.cassiolandim.crosslasers.GameFlowEvent;
 import net.cassiolandim.crosslasers.GameObject;
-import net.cassiolandim.crosslasers.GameObjectManager;
 import net.cassiolandim.crosslasers.Utils;
 import net.cassiolandim.crosslasers.Vector2;
 import net.cassiolandim.crosslasers.GameObject.ActionType;
 import net.cassiolandim.crosslasers.system.HudSystem;
-import net.cassiolandim.crosslasers.system.LevelSystem;
 
 public class NPCComponent extends GameComponent {
 	
@@ -152,51 +149,6 @@ public class NPCComponent extends GameComponent {
         
         if (mPauseTime <= 0.0f) {
 
-            HotSpotSystem hotSpotSystem = sSystemRegistry.hotSpotSystem;
-
-            if (hotSpotSystem != null) {
-            	final float centerX = parentObject.getCenteredPositionX();
-                final int hitTileX = hotSpotSystem.getHitTileX(centerX);
-                final int hitTileY = hotSpotSystem.getHitTileY(parentObject.getPosition().y + 10.0f);
-                boolean accepted = true;
-
-                if (hitTileX != mLastHitTileX || hitTileY != mLastHitTileY) {
-
-            	    final int hotSpot = hotSpotSystem.getHotSpotByTile(hitTileX, hitTileY);
-                    
-                    if (hotSpot >= HotSpotSystem.HotSpotType.NPC_GO_RIGHT && hotSpot <= HotSpotSystem.HotSpotType.NPC_SLOW) {
-                    	// movement-related commands are immediate
-                        parentObject.setCurrentAction(ActionType.MOVE);
-                    	accepted = executeCommand(hotSpot, parentObject, timeDelta);
-                    } else if (hotSpot == HotSpotSystem.HotSpotType.ATTACK && !mPauseOnAttack) {
-                    	// when mPauseOnAttack is false, attacks are also immediate.
-                    	accepted = executeCommand(hotSpot, parentObject, timeDelta);
-                    } else if (hotSpot == HotSpotSystem.HotSpotType.NPC_RUN_QUEUED_COMMANDS) {
-                    	if (!mExecutingQueue && mQueueTop != mQueueBottom) {
-                    		mExecutingQueue = true;
-                        }
-                    } else if (hotSpot > HotSpotSystem.HotSpotType.NONE) {
-                    	queueCommand(hotSpot);
-                    }
-                }
-                
-                if (mExecutingQueue) {
-                	if (mQueueTop != mQueueBottom) {
-                		accepted = executeCommand(nextCommand(), parentObject, timeDelta);
-                		if (accepted) {
-                			advanceQueue();
-                		}
-                	} else {
-                		mExecutingQueue = false;
-                	}
-                }
-                
-                if (accepted) {
-                	mLastHitTileX = hitTileX;
-                	mLastHitTileY = hitTileY;
-                }
-            	
-            }
         } else {
             mPauseTime -= timeDelta;
             if (mPauseTime < 0.0f) {
@@ -209,172 +161,6 @@ public class NPCComponent extends GameComponent {
         mPreviousPosition.set(parentObject.getPosition());
     }
     
-    private boolean executeCommand(int hotSpot, GameObject parentObject, float timeDelta) {
-    	boolean hitAccepted = true;
-    	
-    	switch(hotSpot) {
-        case HotSpotSystem.HotSpotType.WAIT_SHORT:
-            if (mPauseTime == 0.0f) {
-                mPauseTime = PAUSE_TIME_SHORT;
-                pauseMovement(parentObject);
-            }
-            break;
-        case HotSpotSystem.HotSpotType.WAIT_MEDIUM:
-            if (mPauseTime == 0.0f) {
-                mPauseTime = PAUSE_TIME_MEDIUM;
-                pauseMovement(parentObject);
-            }
-            break;
-        case HotSpotSystem.HotSpotType.WAIT_LONG:
-            if (mPauseTime == 0.0f) {
-                mPauseTime = PAUSE_TIME_LONG;
-                pauseMovement(parentObject);
-            }
-            break;
-        case HotSpotSystem.HotSpotType.ATTACK:
-        	if (mPauseOnAttack) {
-	            if (mPauseTime == 0.0f) {
-	                mPauseTime = PAUSE_TIME_ATTACK;
-	                pauseMovement(parentObject);
-	
-	            }
-        	}
-            parentObject.setCurrentAction(ActionType.ATTACK);
-
-            break;
-            
-        case HotSpotSystem.HotSpotType.END_LEVEL:
-        	HudSystem hud = sSystemRegistry.hudSystem;
-        	
-        	if (hud != null) {
-        		hud.startFade(false, 1.5f);
-        		hud.sendGameEventOnFadeComplete(GameFlowEvent.EVENT_GO_TO_NEXT_LEVEL, 0);
-        	}
-        	break;
-        case HotSpotSystem.HotSpotType.GAME_EVENT:
-        	if (mGameEvent != -1) {
-    			LevelSystem level = sSystemRegistry.levelSystem;
-    			if (level != null) {
-    				level.sendGameEvent(mGameEvent, mGameEventIndex, true);
-    				mGameEvent = -1;
-    			}
-    		}
-        	break;
-        	
-        case HotSpotSystem.HotSpotType.NPC_GO_UP_FROM_GROUND:
-            if (!parentObject.touchingGround()) {
-                hitAccepted = false;
-                break;
-            }
-            // fall through
-        case HotSpotSystem.HotSpotType.NPC_GO_UP:
-        	parentObject.getVelocity().y = mUpImpulse;
-        	parentObject.getTargetVelocity().y = 0.0f;
-            mTargetXVelocity = 0.0f;
-            
-            break;
-        case HotSpotSystem.HotSpotType.NPC_GO_DOWN_FROM_CEILING:
-            if (!parentObject.touchingCeiling()) {
-                hitAccepted = false;
-                break;
-            }
-            // fall through
-        case HotSpotSystem.HotSpotType.NPC_GO_DOWN:
-        	parentObject.getVelocity().y = mDownImpulse;
-        	parentObject.getTargetVelocity().y = 0.0f;
-        	if (mFlying) {
-        		mTargetXVelocity = 0.0f;
-        	}
-            break;
-        case HotSpotSystem.HotSpotType.NPC_GO_LEFT:
-        	parentObject.getTargetVelocity().x = -mHorizontalImpulse;
-        	parentObject.getAcceleration().x = mAcceleration;
-        	if (mFlying) {
-        		parentObject.getVelocity().y = 0.0f;
-        		parentObject.getTargetVelocity().y = 0.0f;
-        	}
-            break;
-        case HotSpotSystem.HotSpotType.NPC_GO_RIGHT:
-        	parentObject.getTargetVelocity().x = mHorizontalImpulse;
-        	parentObject.getAcceleration().x = mAcceleration;
-        	if (mFlying) {
-        		parentObject.getVelocity().y = 0.0f;
-        		parentObject.getTargetVelocity().y = 0.0f;
-        	}
-
-            break;
-        case HotSpotSystem.HotSpotType.NPC_GO_UP_RIGHT:
-        	parentObject.getVelocity().y = mUpImpulse;
-        	parentObject.getTargetVelocity().x = mHorizontalImpulse;
-        	parentObject.getAcceleration().x = mAcceleration;
-
-            
-            break;
-        case HotSpotSystem.HotSpotType.NPC_GO_UP_LEFT:
-        	parentObject.getVelocity().y = mUpImpulse;
-        	parentObject.getTargetVelocity().x = -mHorizontalImpulse;
-        	parentObject.getAcceleration().x = mAcceleration;
-
-            
-            break;
-        case HotSpotSystem.HotSpotType.NPC_GO_DOWN_RIGHT:
-        	parentObject.getVelocity().y = mDownImpulse;
-        	parentObject.getTargetVelocity().x = mHorizontalImpulse;
-        	parentObject.getAcceleration().x = mAcceleration;
-
-            
-            break;
-        case HotSpotSystem.HotSpotType.NPC_GO_DOWN_LEFT:
-        	parentObject.getVelocity().y = mDownImpulse;
-        	parentObject.getTargetVelocity().x = -mHorizontalImpulse;
-        	parentObject.getAcceleration().x = mAcceleration;
-
-            
-            break;
-        case HotSpotSystem.HotSpotType.NPC_GO_TOWARDS_PLAYER:
-            int direction = 1;
-            GameObjectManager manager = sSystemRegistry.gameObjectManager;
-            if (manager != null) {
-                GameObject player = manager.getPlayer();
-                if (player != null) {
-                    direction = Utils.sign(
-                            player.getCenteredPositionX() -
-                            parentObject.getCenteredPositionX());
-                }
-            }
-            parentObject.getTargetVelocity().x = mHorizontalImpulse * direction;
-            if (mFlying) {
-            	parentObject.getVelocity().y = 0.0f;
-        		parentObject.getTargetVelocity().y = 0.0f;
-        	}
-            break;
-        case HotSpotSystem.HotSpotType.NPC_GO_RANDOM:
-        	parentObject.getTargetVelocity().x = mHorizontalImpulse * (Math.random() > 0.5f ? -1.0f : 1.0f);
-        	if (mFlying) {
-        		parentObject.getVelocity().y = 0.0f;
-        		parentObject.getTargetVelocity().y = 0.0f;
-        	}
-            break;
-        
-        case HotSpotSystem.HotSpotType.NPC_STOP:
-        	parentObject.getTargetVelocity().x = 0.0f;
-        	parentObject.getVelocity().x = 0.0f;
-            break;
-        
-        case HotSpotSystem.HotSpotType.NPC_SLOW:
-        	parentObject.getTargetVelocity().x = mSlowHorizontalImpulse * Utils.sign(parentObject.getTargetVelocity().x);
-            break;
-            
-        case HotSpotSystem.HotSpotType.NONE:
-            if (parentObject.touchingGround() && parentObject.getVelocity().y <= 0.0f) {
-                //resumeMovement(parentObject);
-            }
-            break;
-    	}
-    	
-    	return hitAccepted;
-    }
-    
     private void pauseMovement(GameObject parentObject) {
     	mTargetXVelocity = parentObject.getTargetVelocity().x;
     	parentObject.getTargetVelocity().x = 0.0f;
@@ -384,23 +170,6 @@ public class NPCComponent extends GameComponent {
     private void resumeMovement(GameObject parentObject) {
     	parentObject.getTargetVelocity().x = mTargetXVelocity;
     	parentObject.getAcceleration().x = mAcceleration;
-    }
-    
-    private int nextCommand() {
-    	int result = HotSpotSystem.HotSpotType.NONE;
-    	if (mQueueTop != mQueueBottom) {
-    		result = mQueuedCommands[mQueueTop];
-    	}
-    	return result;
-    }
-    
-    private int advanceQueue() {
-    	int result = HotSpotSystem.HotSpotType.NONE;
-    	if (mQueueTop != mQueueBottom) {
-    		result = mQueuedCommands[mQueueTop];
-    		mQueueTop = (mQueueTop + 1) % COMMAND_QUEUE_SIZE;
-    	}
-    	return result;
     }
     
     private void queueCommand(int hotspot) {

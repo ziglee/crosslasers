@@ -224,7 +224,6 @@ public class GameObjectFactory extends BaseObject {
         ComponentClass[] componentTypes = {
                 new ComponentClass(AnimationComponent.class, 1),
                 new ComponentClass(AttackAtDistanceComponent.class, 16),
-                new ComponentClass(BackgroundCollisionComponent.class, 192),
                 new ComponentClass(ButtonAnimationComponent.class, 32),
                 new ComponentClass(ChangeComponentsComponent.class, 256),
                 new ComponentClass(DoorAnimationComponent.class, 256),  //!
@@ -248,14 +247,12 @@ public class GameObjectFactory extends BaseObject {
                 new ComponentClass(NPCAnimationComponent.class, 8),
                 new ComponentClass(NPCComponent.class, 8),
                 new ComponentClass(OrbitalMagnetComponent.class, 1),
-                new ComponentClass(PatrolComponent.class, 256),
                 new ComponentClass(PhysicsComponent.class, 8),
                 new ComponentClass(PlayerComponent.class, 1),
                 new ComponentClass(PlaySingleSoundComponent.class, 32),
                 new ComponentClass(PopOutComponent.class, 32),
                 new ComponentClass(RenderComponent.class, 384),
                 new ComponentClass(BackgroundComponent.class, 8),
-                new ComponentClass(SelectDialogComponent.class, 8),
                 new ComponentClass(SimpleCollisionComponent.class, 32),
                 new ComponentClass(SimplePhysicsComponent.class, 256),
                 new ComponentClass(SleeperComponent.class, 32),
@@ -565,45 +562,15 @@ public class GameObjectFactory extends BaseObject {
         
         return newObject;
     }
-    
-	
 
 	public void spawnFromWorld(TiledWorld world) {
-        // Walk the world and spawn objects based on tile indexes.
-        final float worldHeight = world.getHeight() * tileHeight;
-        
         GameObjectManager manager = sSystemRegistry.gameObjectManager;
         if (manager != null) {
-            for (int y = 0; y < world.getHeight(); y++) {
-                for (int x = 0; x < world.getWidth(); x++) {
-                    int index = world.getTile(x, y);
-                    if (index != -1) {
-                        GameObjectType type = GameObjectType.indexToType(index);
-                        if (type != GameObjectType.INVALID) {
-                            final float worldX = x * tileWidth;
-                            final float worldY = worldHeight - ((y + 1) * tileHeight);
-                            GameObject object = spawn(type, worldX, worldY, false);
-                            if (object != null) {
-                                if (object.height < tileHeight) {
-                                    // make sure small objects are vertically centered in their tile.
-                                    object.getPosition().y += (tileHeight - object.height) / 2f;
-                                }
-                                
-                                if (object.width < tileWidth) {
-                                    object.getPosition().x += (tileWidth - object.width) / 2f;
-                                } else if (object.width > tileWidth) {
-                                    object.getPosition().x -= (object.width - tileWidth) / 2f;
-                                }
-                                
-                                manager.add(object);
-                                
-                                if (type == GameObjectType.PLAYER) {
-                                    manager.setPlayer(object);
-                                }
-                            }
-                        }
-                    }
-                }
+            GameObjectType typePlayer = GameObjectType.indexToType(0);
+            GameObject player = spawn(typePlayer, 100, 100, false);
+            if (player != null) {
+                manager.add(player);
+                manager.setPlayer(player);
             }
         }
     }
@@ -863,10 +830,6 @@ public class GameObjectFactory extends BaseObject {
         
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.PLAYER);
-        BackgroundCollisionComponent bgcollision 
-            = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(32, 48);
-        bgcollision.setOffset(16, 0);
         PlayerComponent player = (PlayerComponent)allocateComponent(PlayerComponent.class);
         AnimationComponent animation =
             (AnimationComponent)allocateComponent(AnimationComponent.class);
@@ -954,7 +917,6 @@ public class GameObjectFactory extends BaseObject {
         
         object.add(player);
         object.add(inventory);
-        object.add(bgcollision);
         object.add(render);
         object.add(animation);
         object.add(sprite);  
@@ -964,8 +926,6 @@ public class GameObjectFactory extends BaseObject {
         object.add(invincibleSwap);
         
         addStaticData(GameObjectType.PLAYER, object, sprite);
-      
-       
         
         sprite.playAnimation(PlayerAnimations.IDLE.ordinal());
        
@@ -1215,10 +1175,6 @@ public class GameObjectFactory extends BaseObject {
         }
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.GENERAL_ENEMY);
-        BackgroundCollisionComponent bgcollision 
-            = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(32, 48);
-        bgcollision.setOffset(16, 0);
         
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
@@ -1227,9 +1183,6 @@ public class GameObjectFactory extends BaseObject {
         EnemyAnimationComponent animation 
             = (EnemyAnimationComponent)allocateComponent(EnemyAnimationComponent.class);
         animation.setSprite(sprite);
-        
-        PatrolComponent patrol = (PatrolComponent)allocateComponent(PatrolComponent.class);
-        patrol.setMovementSpeed(50.0f, 1000.0f);
         
         DynamicCollisionComponent collision 
             = (DynamicCollisionComponent)allocateComponent(DynamicCollisionComponent.class);
@@ -1259,7 +1212,6 @@ public class GameObjectFactory extends BaseObject {
         ChangeComponentsComponent ghostSwap 
             = (ChangeComponentsComponent)allocateComponent(ChangeComponentsComponent.class);
         ghostSwap.addSwapInComponent(ghost);
-        ghostSwap.addSwapOutComponent(patrol);
         
         SimplePhysicsComponent ghostPhysics = (SimplePhysicsComponent)allocateComponent(SimplePhysicsComponent.class);
         ghostPhysics.setBounciness(0.0f);
@@ -1267,9 +1219,7 @@ public class GameObjectFactory extends BaseObject {
         object.add(render);
         object.add(sprite);
         
-        object.add(bgcollision);
         object.add(animation);
-        object.add(patrol);
         object.add(collision);
         object.add(hitReact);
         object.add(lifetime);
@@ -1392,10 +1342,6 @@ public class GameObjectFactory extends BaseObject {
         
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.GENERAL_ENEMY);
-        BackgroundCollisionComponent bgcollision 
-            = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(32, 48);
-        bgcollision.setOffset(16, 5);
         
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
@@ -1404,10 +1350,6 @@ public class GameObjectFactory extends BaseObject {
         EnemyAnimationComponent animation 
             = (EnemyAnimationComponent)allocateComponent(EnemyAnimationComponent.class);
         animation.setSprite(sprite);
-        
-        PatrolComponent patrol = (PatrolComponent)allocateComponent(PatrolComponent.class);
-        patrol.setMovementSpeed(20.0f, 1000.0f);
-        patrol.setupAttack(300, 1.0f, 4.0f, true);
         
         DynamicCollisionComponent collision 
             = (DynamicCollisionComponent)allocateComponent(DynamicCollisionComponent.class);
@@ -1445,9 +1387,7 @@ public class GameObjectFactory extends BaseObject {
 
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
-        object.add(patrol);
         object.add(collision);
         object.add(hitReact);
         object.add(lifetime);
@@ -1596,10 +1536,6 @@ public class GameObjectFactory extends BaseObject {
         
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.GENERAL_ENEMY);
-        BackgroundCollisionComponent bgcollision 
-            = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(32, 48);
-        bgcollision.setOffset(16, 5);
         
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
@@ -1654,7 +1590,6 @@ public class GameObjectFactory extends BaseObject {
 
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
         object.add(collision);
         object.add(hitReact);
@@ -1804,10 +1739,6 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.GENERAL_ENEMY);
         
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-		bgcollision.setSize(80, 90);
-		bgcollision.setOffset(32, 5);
-        
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
@@ -1817,9 +1748,6 @@ public class GameObjectFactory extends BaseObject {
             
         EnemyAnimationComponent animation = (EnemyAnimationComponent)allocateComponent(EnemyAnimationComponent.class);
         animation.setSprite(sprite);
-        
-        PatrolComponent patrol = (PatrolComponent)allocateComponent(PatrolComponent.class);
-        patrol.setMovementSpeed(20.0f, 400.0f);
         
         DynamicCollisionComponent collision = (DynamicCollisionComponent)allocateComponent(DynamicCollisionComponent.class);
         sprite.setCollisionComponent(collision);
@@ -1838,19 +1766,12 @@ public class GameObjectFactory extends BaseObject {
         
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
-        object.add(patrol);
         object.add(collision);
         object.add(hitReact);
         object.add(lifetime);
        
         addStaticData(GameObjectType.MUDMAN, object, sprite);
-        
-        final SpriteAnimation attack = sprite.findAnimation(EnemyAnimations.ATTACK.ordinal());
-        if (attack != null) {
-            patrol.setupAttack(70.0f, attack.getLength(), 0.0f, true);
-        }
         
         sprite.playAnimation(0);
         
@@ -1953,10 +1874,6 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.GENERAL_ENEMY);
         
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-		bgcollision.setSize(32, 48);
-		bgcollision.setOffset(16, 5);
-        
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
 		sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
@@ -1964,10 +1881,6 @@ public class GameObjectFactory extends BaseObject {
         EnemyAnimationComponent animation = (EnemyAnimationComponent)allocateComponent(EnemyAnimationComponent.class);
         animation.setSprite(sprite);
         
-        PatrolComponent patrol = (PatrolComponent)allocateComponent(PatrolComponent.class);
-        patrol.setMovementSpeed(20.0f, 1000.0f);
-        patrol.setTurnToFacePlayer(true);
-
         DynamicCollisionComponent collision = (DynamicCollisionComponent)allocateComponent(DynamicCollisionComponent.class);
         sprite.setCollisionComponent(collision);
         
@@ -1990,19 +1903,12 @@ public class GameObjectFactory extends BaseObject {
                 
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
-        object.add(patrol);
         object.add(collision);
         object.add(hitReact);
         object.add(lifetime);
         
         addStaticData(GameObjectType.SKELETON, object, sprite);
-        
-        final SpriteAnimation attack = sprite.findAnimation(EnemyAnimations.ATTACK.ordinal());
-        if (attack != null) {
-            patrol.setupAttack(75.0f, attack.getLength(), 2.0f, true);
-        }
         
         sprite.playAnimation(0);
 
@@ -2062,11 +1968,6 @@ public class GameObjectFactory extends BaseObject {
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
          
-        PatrolComponent patrol = (PatrolComponent)allocateComponent(PatrolComponent.class);
-        patrol.setMovementSpeed(50.0f, 1000.0f);
-        patrol.setTurnToFacePlayer(false);
-        patrol.setFlying(true);
-
         DynamicCollisionComponent collision = (DynamicCollisionComponent)allocateComponent(DynamicCollisionComponent.class);
         sprite.setCollisionComponent(collision);
         
@@ -2095,7 +1996,6 @@ public class GameObjectFactory extends BaseObject {
         object.add(render);
         object.add(animation);
         object.add(sprite);
-        object.add(patrol);
         object.add(collision);
         object.add(hitReact);
         object.add(lifetime);
@@ -2222,10 +2122,6 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.GENERAL_ENEMY);
         
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(100, 75);
-        bgcollision.setOffset(12, 5);
-        
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
@@ -2254,7 +2150,6 @@ public class GameObjectFactory extends BaseObject {
         
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
         object.add(collision);
         object.add(hitReact);
@@ -2328,11 +2223,6 @@ public class GameObjectFactory extends BaseObject {
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
          
-        PatrolComponent patrol = (PatrolComponent)allocateComponent(PatrolComponent.class);
-        patrol.setMovementSpeed(75.0f, 1000.0f);
-        patrol.setTurnToFacePlayer(false);
-        patrol.setFlying(true);
-
         DynamicCollisionComponent collision = (DynamicCollisionComponent)allocateComponent(DynamicCollisionComponent.class);
         sprite.setCollisionComponent(collision);
         
@@ -2362,7 +2252,6 @@ public class GameObjectFactory extends BaseObject {
         object.add(render);
         object.add(animation);
         object.add(sprite);
-        object.add(patrol);
         object.add(collision);
         object.add(hitReact);
         object.add(lifetime);
@@ -2427,11 +2316,6 @@ public class GameObjectFactory extends BaseObject {
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
          
-        PatrolComponent patrol = (PatrolComponent)allocateComponent(PatrolComponent.class);
-        patrol.setMovementSpeed(75.0f, 1000.0f);
-        patrol.setTurnToFacePlayer(false);
-        patrol.setFlying(true);
-
         DynamicCollisionComponent collision = (DynamicCollisionComponent)allocateComponent(DynamicCollisionComponent.class);
         sprite.setCollisionComponent(collision);
         
@@ -2461,7 +2345,6 @@ public class GameObjectFactory extends BaseObject {
         object.add(render);
         object.add(animation);
         object.add(sprite);
-        object.add(patrol);
         object.add(collision);
         object.add(hitReact);
         object.add(lifetime);
@@ -2533,11 +2416,6 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.GENERAL_ENEMY);
         
-        BackgroundCollisionComponent bgcollision 
-            = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(32, 48);
-        bgcollision.setOffset(16, 5);
-        
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
@@ -2545,9 +2423,6 @@ public class GameObjectFactory extends BaseObject {
         EnemyAnimationComponent animation 
             = (EnemyAnimationComponent)allocateComponent(EnemyAnimationComponent.class);
         animation.setSprite(sprite);
-        
-        PatrolComponent patrol = (PatrolComponent)allocateComponent(PatrolComponent.class);
-        patrol.setMovementSpeed(50.0f, 1000.0f);
         
         DynamicCollisionComponent collision 
             = (DynamicCollisionComponent)allocateComponent(DynamicCollisionComponent.class);
@@ -2568,9 +2443,7 @@ public class GameObjectFactory extends BaseObject {
         object.add(render);
         object.add(sprite);
         
-        object.add(bgcollision);
         object.add(animation);
-        object.add(patrol);
         object.add(collision);
         object.add(hitReact);
         object.add(lifetime);
@@ -2758,10 +2631,6 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.NPC);
         
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(32, 82);
-        bgcollision.setOffset(20, 5);
-        
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
@@ -2776,8 +2645,6 @@ public class GameObjectFactory extends BaseObject {
         
         HitReactionComponent hitReact = (HitReactionComponent)allocateComponent(HitReactionComponent.class);
         collision.setHitReactionComponent(hitReact);
-        
-        patrol.setHitReactionComponent(hitReact);
         
         SoundSystem sound = sSystemRegistry.soundSystem;
         
@@ -2803,7 +2670,6 @@ public class GameObjectFactory extends BaseObject {
         object.add(gun);
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
         object.add(patrol);
         object.add(collision);
@@ -2944,10 +2810,6 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.NPC);
 
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(32, 90);
-        bgcollision.setOffset(20, 5); 
-        
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
@@ -2966,8 +2828,6 @@ public class GameObjectFactory extends BaseObject {
         HitReactionComponent hitReact = (HitReactionComponent)allocateComponent(HitReactionComponent.class);
         collision.setHitReactionComponent(hitReact);
         
-        patrol.setHitReactionComponent(hitReact); 
-        
         MotionBlurComponent motionBlur = (MotionBlurComponent)allocateComponent(MotionBlurComponent.class);
         motionBlur.setTarget(render);
         
@@ -2985,7 +2845,6 @@ public class GameObjectFactory extends BaseObject {
                 
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
         object.add(patrol);
         object.add(collision);
@@ -3045,17 +2904,13 @@ public class GameObjectFactory extends BaseObject {
         
         HitReactionComponent hitReact = (HitReactionComponent)allocateComponent(HitReactionComponent.class);
         dynamicCollision.setHitReactionComponent(hitReact);
-        hitReact.setSpawnGameEventOnHit(HitType.COLLECT, GameFlowEvent.EVENT_SHOW_DIALOG_CHARACTER2, 0);
         
-        SelectDialogComponent dialogSelect = (SelectDialogComponent)allocateComponent(SelectDialogComponent.class);
-        dialogSelect.setHitReact(hitReact);
         
         // Since this object doesn't have gravity or background collision, adjust down to simulate the position
         // at which a bounding volume would rest.
         
         object.getPosition().y -= 5.0f;
         
-        object.add(dialogSelect);
         object.add(render);
         object.add(sprite);
         object.add(dynamicCollision);
@@ -3207,10 +3062,6 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.NPC);
 
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(38, 82);
-        bgcollision.setOffset(16, 5);
-        
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
@@ -3226,8 +3077,6 @@ public class GameObjectFactory extends BaseObject {
         HitReactionComponent hitReact = (HitReactionComponent)allocateComponent(HitReactionComponent.class);
         collision.setHitReactionComponent(hitReact);
         
-        patrol.setHitReactionComponent(hitReact);
-        
         object.team = Team.ENEMY;
         object.life = 1;
 
@@ -3237,7 +3086,6 @@ public class GameObjectFactory extends BaseObject {
                 
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
         object.add(patrol);
         object.add(collision);
@@ -3317,14 +3165,8 @@ public class GameObjectFactory extends BaseObject {
         sprite.setCollisionComponent(dynamicCollision);
         
         HitReactionComponent hitReact = (HitReactionComponent)allocateComponent(HitReactionComponent.class);
-        hitReact.setSpawnGameEventOnHit(HitType.COLLECT, GameFlowEvent.EVENT_SHOW_DIALOG_CHARACTER2, 0);
-
-        SelectDialogComponent dialogSelect = (SelectDialogComponent)allocateComponent(SelectDialogComponent.class);
-        dialogSelect.setHitReact(hitReact);
-        
         dynamicCollision.setHitReactionComponent(hitReact);
         
-        object.add(dialogSelect);
         object.add(render);
         object.add(sprite);
         object.add(dynamicCollision);
@@ -3403,14 +3245,8 @@ public class GameObjectFactory extends BaseObject {
         sprite.setCollisionComponent(dynamicCollision);
         
         HitReactionComponent hitReact = (HitReactionComponent)allocateComponent(HitReactionComponent.class);
-        hitReact.setSpawnGameEventOnHit(HitType.COLLECT, GameFlowEvent.EVENT_SHOW_DIALOG_CHARACTER2, 0);
-
-        SelectDialogComponent dialogSelect = (SelectDialogComponent)allocateComponent(SelectDialogComponent.class);
-        dialogSelect.setHitReact(hitReact);
-       
         dynamicCollision.setHitReactionComponent(hitReact);
         
-        object.add(dialogSelect);
         object.add(render);
         object.add(sprite);
         object.add(dynamicCollision);
@@ -3528,10 +3364,6 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.NPC);
 
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(38, 82);
-        bgcollision.setOffset(45, 5);
-        
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
@@ -3561,8 +3393,6 @@ public class GameObjectFactory extends BaseObject {
         	hitReact.setTakeHitSound(HitType.HIT, sound.load(R.raw.sound_kabocha_hit));
         }
         
-        patrol.setHitReactionComponent(hitReact);
-        
         object.team = Team.ENEMY;
         object.life = 3;
         
@@ -3572,7 +3402,6 @@ public class GameObjectFactory extends BaseObject {
                 
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
         object.add(patrol);
         object.add(collision);
@@ -3700,15 +3529,9 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.NPC);
 
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(45, 75);
-        bgcollision.setOffset(45, 23);
-        
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
         sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
-        
-       
         
         NPCAnimationComponent animation = (NPCAnimationComponent)allocateComponent(NPCAnimationComponent.class);
         animation.setSprite(sprite);
@@ -3737,8 +3560,6 @@ public class GameObjectFactory extends BaseObject {
         if (sound != null) {
         	hitReact.setTakeHitSound(HitType.HIT, sound.load(R.raw.sound_rokudou_hit));
         }
-        
-        patrol.setHitReactionComponent(hitReact);
         
         ChangeComponentsComponent deathSwap = (ChangeComponentsComponent)allocateComponent(ChangeComponentsComponent.class);
         deathSwap.addSwapInComponent(allocateComponent(GravityComponent.class));
@@ -3786,7 +3607,6 @@ public class GameObjectFactory extends BaseObject {
                 
         object.add(render);
         object.add(sprite);
-        object.add(bgcollision);
         object.add(animation);
         object.add(patrol);
         object.add(collision);
@@ -3868,10 +3688,6 @@ public class GameObjectFactory extends BaseObject {
         RenderComponent render = (RenderComponent)allocateComponent(RenderComponent.class);
         render.setPriority(SortConstants.PROJECTILE);
 
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-		bgcollision.setSize(64, 64);
-		bgcollision.setOffset(0, 0);
-
         SpriteComponent sprite = (SpriteComponent)allocateComponent(SpriteComponent.class);
 		sprite.setSize((int)object.width, (int)object.height);
         sprite.setRenderComponent(render);
@@ -3893,7 +3709,6 @@ public class GameObjectFactory extends BaseObject {
         
         object.life = 1;
 
-        object.add(bgcollision);
         object.add(render);
         object.add(sprite);  
         object.add(dynamicCollision);  
@@ -6235,15 +6050,9 @@ public class GameObjectFactory extends BaseObject {
         LifetimeComponent lifetime = (LifetimeComponent)allocateComponent(LifetimeComponent.class);
         lifetime.setTimeUntilDeath(3.0f);
         
-        BackgroundCollisionComponent bgcollision = (BackgroundCollisionComponent)allocateComponent(BackgroundCollisionComponent.class);
-        bgcollision.setSize(12, 12);
-        bgcollision.setOffset(2, 2); 
-        
-        
         object.destroyOnDeactivation = true;
         
         object.add(lifetime);
-        object.add(bgcollision);
         
         addStaticData(GameObjectType.BREAKABLE_BLOCK_PIECE, object, null);
      
